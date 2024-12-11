@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <description>$description$</description>
+    <authors>$authors$</authors>
+
+    <projectUrl>$projectUrl$</projectUrl>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon>, see more: https://learn.microsoft.com/en-us/nuget/reference/nuspec#icon -->
+    <readme>docs/Readme.md</readme>
+    <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
+    <releaseNotes>$releaseNotes$</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>$packageTags$</tags>
+
+    <dependencies>
+      <group targetFramework="$targetFramework$">
+        <!-- Auzre Monitor Open Telemetry SDK for application insights -->
+        <dependency id="Azure.Monitor.OpenTelemetry.Profiler.Core" version="$version$" exclude="Build,Analyzers" />
+        <!-- Core package for profiler -->
+        <dependency id="Azure.Monitor.OpenTelemetry.AspNetCore" version="$AzureMonitorOpenTelemetryAspNetCoreVersion$" exclude="Build,Analyzers" />
+
+        <!-- Other packages -->
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="$MicrosoftExtensionsConfigurationAbstractionsVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration.Binder" version="$MicrosoftExtensionsConfigurationBinderVersion$" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <contentFiles>
+      <files include="any\net6.0\ServiceProfiler\TraceUpload.zip" buildAction="None" copyToOutput="true" flatten="true" />
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\$targetFramework$\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.pdb" target="lib/$targetFramework$"></file>
+
+    <file src="..\Readme.md" target="docs\" />
+    <file src="obj\$configuration$\Uploader\Uploader.zip" target="contentFiles\any\net6.0\ServiceProfiler\TraceUpload.zip"></file>
+  </files>
+</package>

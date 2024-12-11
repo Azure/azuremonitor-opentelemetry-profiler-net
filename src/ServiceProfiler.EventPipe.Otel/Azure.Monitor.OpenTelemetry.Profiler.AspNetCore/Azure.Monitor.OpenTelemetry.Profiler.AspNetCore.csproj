@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <NuspecFile>Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.nuspec</NuspecFile>
+    
+    <PackageId>Azure.Monitor.OpenTelemetry.Profiler.AspNetCore</PackageId>
+    <PackageTags>Microsoft Azure Monitor OpenTelemetry Profiler ASP.NET Performance</PackageTags>
+    <Description>Library for Azure Monitor OpenTelemetry Profiler for ASP.NET Core.</Description>
+    <NuspecProperties> configuration=$(Configuration); id=$(PackageId); description=$(Description); packageTags=$(PackageTags); targetFramework=$(TargetFramework); $(NuspecProperties)
+    </NuspecProperties>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+  </ItemGroup>
+
+
+</Project>

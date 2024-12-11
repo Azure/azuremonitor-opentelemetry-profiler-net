@@ -1,12 +1,111 @@
-# Project
+# Azure Monitor OpenTelemetry Profiler for .NET (PREVIEW)
 
 ## Description
 
-Welcome to the home page of `Azure Monitor OpenTelemetry Profiler for .NET`.
+Welcome to the home page of `Azure Monitor OpenTelemetry Profiler for .NET (PREVIEW)`.
 
 ## Get Started
 
-// TODO: Add instructions
+### Step 0: Prerequisites
+
+- **.NET 8 SDK**: Install the latest .NET Core SDK from [here](https://dotnet.microsoft.com/download/dotnet).
+
+### Step 1: Create an ASP.NET Core Application
+
+If you don't have an app already, you can create a new web API project using the following command:
+
+```sh
+dotnet new web
+```
+
+### Step 2: Add NuGet Package Reference
+
+Add a reference to the latest NuGet packages:
+
+```sh
+dotnet add package Azure.Monitor.OpenTelemetry.Profiler.AspNetCore --prerelease
+```
+
+This will automatically add a dependency to `Azure.Monitor.OpenTelemetry.AspNetCore`.
+
+### Step 3: Enable Application Insights with OpenTelemetry
+
+Follow the [instructions](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=aspnetcore#enable-opentelemetry-with-application-insights) to enable Azure Monitor OpenTelemetry for .NET.
+
+Verify that the connection to Application Insights works -- [Confirm Data is Flowing](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=aspnetcore#confirm-data-is-flowing).
+
+### Step 4: Enable Profiler
+
+Append the call to `UseProfiler()` in your code:
+
+```csharp
+using Azure.Monitor.OpenTelemetry.Profiler.AspNetCore;
+
+...
+
+builder.Services.AddOpenTelemetry()
+        .UseAzureMonitor()
+        .UseProfiler();  // Append this line
+
+...
+```
+
+### Step 5: Run Your Application
+
+Run your application and check the log output. A successful execution will look like this:
+
+```sh
+PS > dotnet run
+
+Building...
+
+info: Microsoft.ApplicationInsights.Profiler.Shared.Services.TraceScavenger.TraceScavengerService[0]
+      TraceScavengerService started. Initial delay: 00:00:00, Grace period from last access: 00:10:00
+info: Microsoft.ApplicationInsights.Profiler.Shared.Services.TraceScavenger.TraceScavengerListener[0] 
+      File scavenger started.
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5143
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\
+info: Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.ServiceProfilerAgentBootstrap[0]
+      Starting application insights profiler with connection string: InstrumentationKey=5d…
+info: Azure.Monitor.OpenTelemetry.Profiler.Core.DumbTraceControl[0]
+      Start writing trace file C:\Users\aaa\AppData\Local\Temp\SPTraces\...
+info: Azure.Monitor.OpenTelemetry.Profiler.Core.EventListeners.TraceSessionListener[0]
+      Activity detected.
+info: Azure.Monitor.OpenTelemetry.Profiler.Core.DumbTraceControl[0]
+      Finished writing trace file C:\Users\aaa\AppData\Local\Temp\SPTraces\b73520a6-931f-4207-b602-0d72d376609a.nettrace.
+info: Azure.Monitor.OpenTelemetry.Profiler.Core.TraceUploaderProxy[0]
+      Uploader to be used: C:\...\Microsoft.ApplicationInsights.Profiler.Uploader.dll
+
+Uploader Hosting Environment is set to: Development.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\...
+info: Microsoft.ApplicationInsights.Profiler.Uploader.TraceUploaderByNamedPipe[0]
+      Service Profiler trace uploaded.
+info: Microsoft.ApplicationInsights.Profiler.Uploader.TraceUploaderByNamedPipe[0]
+      Trace file will be preserved at: C:\...\*.etl.zip
+info: Microsoft.ApplicationInsights.Profiler.Uploader.TraceUploaderByNamedPipe[0]
+      Sending customer events
+info: Microsoft.ApplicationInsights.Profiler.Uploader.TraceUploaderByNamedPipe[0]
+      AAD auth is enabled.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: Azure.Monitor.OpenTelemetry.Profiler.Core.TraceUploaderProxy[0] 
+      Call upload trace finished. Exit code: 0
+```
+
+### Step 6: View Profiler Data
+
+You can view the profiler data by following [these instructions](https://learn.microsoft.com/azure/azure-monitor/profiler/profiler-data).
 
 ## Contributing
 

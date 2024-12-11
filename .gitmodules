@@ -1,0 +1,3 @@
+[submodule "ServiceProfiler"]
+	path = ServiceProfiler
+	url = https://devdiv.visualstudio.com/DefaultCollection/OnlineServices/_git/ServiceProfiler
