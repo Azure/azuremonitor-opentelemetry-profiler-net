@@ -29,12 +29,12 @@ internal class AuthTokenProvider(
 
     public async Task<AccessToken> GetTokenAsync(CancellationToken cancellationToken)
     {
-        TokenCredential? tokenCredential = _serviceProfilerOptions.Credential;
-        if (tokenCredential is null)
+        if(!IsAADAuthenticateEnabled)
         {
-            throw new InvalidOperationException($"Credential is not provided. How does it pass the check of {nameof(IsAADAuthenticateEnabled)}?");
+            return default;
         }
 
+        TokenCredential? tokenCredential = _serviceProfilerOptions.Credential ?? throw new InvalidOperationException($"Credential is not provided. How does it pass the check of {nameof(IsAADAuthenticateEnabled)}?");
         string scope = GetScope();
 
         TokenRequestContext tokenRequestContext = new(scopes: [scope]);
