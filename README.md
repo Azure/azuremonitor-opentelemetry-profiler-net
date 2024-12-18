@@ -8,15 +8,19 @@ Welcome to the home page of `Azure Monitor OpenTelemetry Profiler for .NET (PREV
 
 ### Step 0: Prerequisites
 
-- **.NET 8 SDK**: Install the latest .NET Core SDK from [here](https://dotnet.microsoft.com/download/dotnet).
+- **.NET 6.0 or later**: Install the latest .NET SDK from [here](https://dotnet.microsoft.com/download/dotnet).
+- **Supported Environments**:
 
-### Step 1: Create an ASP.NET Core Application
+  - Windows
+  - Containerized apps in Windows or Linux
+  - Azure App Service
+  - Azure Kubernetes Service (AKS)
+
+### Step 1: Create a .NET Application
 
 If you don't have an app already, you can create a new web API project using the following command:
 
-```sh
-dotnet new web
-```
+    dotnet new web
 
 ### Step 2: Generate a PAT
 
