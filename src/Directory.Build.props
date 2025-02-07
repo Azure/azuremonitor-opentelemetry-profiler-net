@@ -1,0 +1,7 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <LangVersion>12.0</LangVersion>
+    <IncludeMicroBuild>false</IncludeMicroBuild>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,3 @@
+[submodule "ServiceProfiler"]
+	path = ServiceProfiler
+	url = https://dev.azure.com/devdiv/OnlineServices/_git/ServiceProfiler
