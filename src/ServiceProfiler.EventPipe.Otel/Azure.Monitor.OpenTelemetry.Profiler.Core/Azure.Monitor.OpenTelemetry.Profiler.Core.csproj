@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NuspecFile>Azure.Monitor.OpenTelemetry.Profiler.Core.nuspec</NuspecFile>
+    <PackageId>Azure.Monitor.OpenTelemetry.Profiler.Core</PackageId>
+    <PackageTags>Microsoft Azure Monitor OpenTelemetry Profiler Performance</PackageTags>
+    <Description>Core Library for Azure Monitor OpenTelemetry Profiler.</Description>
+
+    <NuspecProperties> configuration=$(Configuration); id=$(PackageId); description=$(Description); packageTags=$(PackageTags); targetFramework=$(TargetFramework); $(NuspecProperties)
+    </NuspecProperties>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Core" />
+    <PackageReference Include="CommandLineParser" />
+    <PackageReference Include="OpenTelemetry" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Microsoft.ApplicationInsights.Profiler.Shared.csproj" />
+    <ProjectReference Include="..\..\ServiceProfiler.ProcessMonitor\ServiceProfiler.ProcessMonitor.csproj" />
+  </ItemGroup>
+</Project>

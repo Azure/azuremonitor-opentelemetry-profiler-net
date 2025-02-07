@@ -1,0 +1,39 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <!-- Deterministic Build when build online -->
+  <PropertyGroup Condition=" '$(SERVER_BUILD)' == 'true' ">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- Determine the version to use -->
+  <PropertyGroup>
+    <!-- The current release version. -->
+    <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">1.0.0</VersionPrefix>
+    <!-- Assuming Version = Prefix-Suffix -->
+    <Version Condition=" '$(Version)' == '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <!-- When suffix doesn't exist, remove it alone with the dash -->
+    <Version Condition=" '$(VersionSuffix)' == '' ">$(VersionPrefix)</Version>
+  </PropertyGroup>
+
+  <!--Shared Properties for NuGet package-->
+  <!--Refer aka.ms/nuget for Microsoft NuGet packages authoring compliance-->
+  <PropertyGroup>
+    <!-- Package version is defualt to version. -->
+    <PackageVersion Condition=" '$(PackageVersion)' == '' ">$(Version)</PackageVersion>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <Authors>Microsoft</Authors>
+    <Owners>microsoft,MicrosoftServiceProfiler</Owners>
+    <PackageProjectUrl>https://github.com/Azure/azuremonitor-opentelemetry-profiler-net</PackageProjectUrl>
+    <RequireLicenseAcceptance>true</RequireLicenseAcceptance>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <NuspecProperties><![CDATA[authors=$(Authors);
+copyright=$(Copyright); 
+owners=$(Owners);
+projectUrl=$(PackageProjectUrl); 
+releaseNotes=$(PackageReleaseNotes); 
+requireLicenseAcceptance=$(RequireLicenseAcceptance); 
+version=$(PackageVersion);
+$(NuspecProperties)]]>
+    </NuspecProperties>
+  </PropertyGroup>
+</Project>
