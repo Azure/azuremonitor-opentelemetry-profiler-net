@@ -84,17 +84,19 @@ extends:
             version: '8.x'
 
             
-        - task: PowerShell@2
+        - task: DotNetCoreCLI@2
           inputs:
-            filePath: '$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/tools/PackSolution.ps1'   
+            command: 'restore'
+            projects: $(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.Contract.Agent/Microsoft.ServiceProfiler.Contract.Agent.csproj
+            feedsToUse: 'select'
+            vstsFeed: '72e4d777-3b02-4ece-99df-3683805cbd5e'
+            includeNuGetOrg: false
 
         - task: PowerShell@2
           inputs:
             targetType: 'inline'
             script: |
-              git config core.symlinks true
-              git fetch -p --all
-              git checkout 
+              
               dotnet restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
               dotnet build --no-restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
             
