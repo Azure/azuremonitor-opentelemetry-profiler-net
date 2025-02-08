@@ -79,7 +79,8 @@ extends:
             targetType: 'inline'
             script: |
               git config --global core.symlinks true
-              git pull --rebase && git reset --hard HEAD
+              git pull --rebase
+              git reset --hard HEAD
         - task: NuGetToolInstaller@1
           displayName: Use Latest NuGet
           
