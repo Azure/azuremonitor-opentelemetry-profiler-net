@@ -112,7 +112,7 @@
       "alternativeSignatures": [
         "615ae007e023e9afee68d25e8abd32b8c4386f07ac5bc93e876305944b8d90f8"
       ],
-      "target": "tests/e2e-tests/ServiceProfiler.TestVMCreation/WindowsVirtualMachine.json",
+      "target": "ServiceProfiler/tests/e2e-tests/ServiceProfiler.TestVMCreation/WindowsVirtualMachine.json",
       "line": 188,
       "memberOf": [
         "default"
