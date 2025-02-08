@@ -87,11 +87,18 @@ extends:
         - task: PowerShell@2
           inputs:
             filePath: '$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/tools/PackSolution.ps1'   
+
+        - task: PowerShell@2
+          inputs:
+            targetType: 'inline'
+            script: |
+              dotnet restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
+              dotnet build  --no-restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln'
             
         - task: DotNetCoreCLI@2
           inputs:
             command: 'restore'
-            projects: '$(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln'
+            projects: $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
             feedsToUse: 'select'
             vstsFeed: '72e4d777-3b02-4ece-99df-3683805cbd5e'
             includeNuGetOrg: false
