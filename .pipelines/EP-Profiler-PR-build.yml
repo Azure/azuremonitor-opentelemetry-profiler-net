@@ -79,6 +79,7 @@ extends:
             targetType: 'inline'
             script: |
               git config --global core.symlinks true
+              git config --global core.symlinks
               git pull --rebase
               git reset --hard HEAD
         - task: NuGetToolInstaller@1
