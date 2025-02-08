@@ -90,7 +90,14 @@ extends:
             packageType: 'sdk'
             version: '8.x'
 
+
+            
+        - task: PowerShell@2
+          inputs:
+            filePath: '$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/tools/PackSolution.ps1'
+
         - task: NuGetCommand@2
+
           inputs:
             command: 'restore'
             restoreSolution: '$(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln'
