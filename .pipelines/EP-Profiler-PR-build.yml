@@ -74,6 +74,12 @@ extends:
         variables:
           ob_outputDirectory: '$(REPOROOT)\out'  # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
         steps:
+        - task: PowerShell@2
+          inputs:
+            targetType: 'inline'
+            script: |
+              git config --global core.symlinks true
+              git pull --rebase && git reset --hard HEAD
         - task: NuGetToolInstaller@1
           displayName: Use Latest NuGet
           
