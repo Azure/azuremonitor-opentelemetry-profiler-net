@@ -23,7 +23,7 @@ variables:
 
   ### Specify container image and other global variables in this section! ###
   # https://eng.ms/docs/products/onebranch/build/containerbasedworkflow#minimal-required-yaml | This doesn't work for me: https://aka.ms/obpipelines/variables
-  WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest' # for Windows jobs https://aka.ms/obpipelines/containers
+  WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2019/vse2022:latest' # for Windows jobs https://aka.ms/obpipelines/containers
 
 resources:
   repositories:
@@ -31,9 +31,9 @@ resources:
     type: git
     name: OneBranch.Pipelines/GovernedTemplates
     ref: refs/heads/main
-  - repository: ServiceProfiler # my team templates
+  - repository: ServiceProfiler 
     type: git
-    name: OnlineServices/ServiceProfiler # project and repo name where to find templates
+    name: OnlineServices/ServiceProfiler 
     ref: refs/heads/main
 
 extends:
