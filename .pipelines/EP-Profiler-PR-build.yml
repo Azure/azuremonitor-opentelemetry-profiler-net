@@ -60,6 +60,9 @@ extends:
         break: true  # always break the build on binskim issues in addition to TSA upload
       policheck:
         break: true  # always break the build on policheck issues. You can disable it by setting to 'false'
+      suppression:
+        suppressionFile: $(Build.SourcesDirectory)\.gdn\.gdnsuppress
+        suppressionSet: default
 
     stages:
     # The file contains an example HelloWorld script. For more info and examples, see the links below
