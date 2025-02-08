@@ -24,7 +24,6 @@ variables:
   ### Specify container image and other global variables in this section! ###
   # https://eng.ms/docs/products/onebranch/build/containerbasedworkflow#minimal-required-yaml | This doesn't work for me: https://aka.ms/obpipelines/variables
   WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest' # for Windows jobs https://aka.ms/obpipelines/containers
-  LinuxContainerImage: 'mcr.microsoft.com/onebranch/cbl-mariner/build:2.0' # for Linux jobs
 
 resources:
   repositories:
@@ -40,15 +39,13 @@ resources:
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates  # https://aka.ms/obpipelines/templates
   parameters:
-    cloudvault:  # https://aka.ms/obpipelines/cloudvault
-      enabled: false
-      ### Linux Pipelines can uncomment the following to run CloudVault update as a seperate stage. ###
-      # runmode: stage
-      # dependsOn: linux_build
-      # artifacts:
-      #  - drop_linux_stage_linux_job
     git:
       submodules: true
+    nugetPublishing:
+      feeds:
+        - name: ServiceProfiler
+          continueOnConflict: true
+          files_to_publish: "*.nupkg;!*.symbols.nupkg"
     globalSdl:  # https://aka.ms/obpipelines/sdl
       perStage:
         sdl_sources:
@@ -77,6 +74,9 @@ extends:
         variables:
           ob_outputDirectory: '$(REPOROOT)\out'  # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
         steps:
+        - task: NuGetToolInstaller@1
+          displayName: Use Latest NuGet
+          
         - task: UseDotNet@2
           inputs:
             packageType: 'sdk'
