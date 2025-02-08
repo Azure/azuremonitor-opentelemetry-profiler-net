@@ -93,7 +93,7 @@ extends:
             targetType: 'inline'
             script: |
               dotnet restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
-              dotnet build  --no-restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln'
+              dotnet build --no-restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
             
         - task: DotNetCoreCLI@2
           inputs:
