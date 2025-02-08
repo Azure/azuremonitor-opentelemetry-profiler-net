@@ -52,14 +52,10 @@ extends:
           checkout_all_repos: true
       tsa:
         enabled: false  # onebranch publish all SDL results to TSA. If TSA is disabled all SDL tools will forced into 'break' build mode.
-      credscan:
-        suppressionsFile: $(Build.SourcesDirectory)\.config\CredScanSuppressions.json
       binskim:
         break: true  # always break the build on binskim issues in addition to TSA upload
       policheck:
         break: true  # always break the build on policheck issues. You can disable it by setting to 'false'
-      # suppression:
-      #   suppressionFile: $(Build.SourcesDirectory)\.gdn\global.gdnsuppress
 
     stages:
     # The file contains an example HelloWorld script. For more info and examples, see the links below
@@ -83,23 +79,12 @@ extends:
             packageType: 'sdk'
             version: '8.x'
 
-            
-        # - task: DotNetCoreCLI@2
-        #   inputs:
-        #     command: 'restore'
-        #     projects: $(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.Contract.Agent/Microsoft.ServiceProfiler.Contract.Agent.csproj
-        #     feedsToUse: 'select'
-        #     vstsFeed: '72e4d777-3b02-4ece-99df-3683805cbd5e'
-        #     includeNuGetOrg: false
-
         - task: PowerShell@2
           inputs:
             targetType: 'inline'
             script: |
               git config core.symlinks true
-              git reset --hard
-              dotnet restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
-              dotnet build --no-restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
+              git reset --hard      
             
         - task: DotNetCoreCLI@2
           inputs:
@@ -109,13 +94,18 @@ extends:
             vstsFeed: '72e4d777-3b02-4ece-99df-3683805cbd5e'
             includeNuGetOrg: false
 
-        # - task: NuGetCommand@2
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'build'
+            projects: '$(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln'
+            arguments: '--no-restore'
 
-        #   inputs:
-        #     command: 'restore'
-        #     restoreSolution: 
-        #     feedsToUse: 'select'
-        #     vstsFeed: 'devdiv/DiagnosticServices'
-        #     includeNuGetOrg: false
+        - task: PowerShell@2
+          inputs:
+            targetType: 'inline'
+            script: |
+              dotnet publish $(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/ServiceProfiler.EventPipe.Upload.csproj --no-build --nologo -f net6.0 --no-restore --disable-build-servers
+        
+
         
 ## For info and instructions on CloudTest, see https://aka.ms/obpipelines/cloudtest
