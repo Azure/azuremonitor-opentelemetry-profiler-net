@@ -73,7 +73,7 @@ extends:
       jobs:
       - job: sampleJob
         pool:
-          type: linux
+          type: windows
         variables:
           ob_outputDirectory: '$(REPOROOT)\out'  # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
         steps:
