@@ -84,21 +84,21 @@ extends:
             version: '8.x'
 
             
-        - task: DotNetCoreCLI@2
-          inputs:
-            command: 'restore'
-            projects: $(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.Contract.Agent/Microsoft.ServiceProfiler.Contract.Agent.csproj
-            feedsToUse: 'select'
-            vstsFeed: '72e4d777-3b02-4ece-99df-3683805cbd5e'
-            includeNuGetOrg: false
-
-        # - task: PowerShell@2
+        # - task: DotNetCoreCLI@2
         #   inputs:
-        #     targetType: 'inline'
-        #     script: |
-              
-        #       dotnet restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
-        #       dotnet build --no-restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
+        #     command: 'restore'
+        #     projects: $(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.Contract.Agent/Microsoft.ServiceProfiler.Contract.Agent.csproj
+        #     feedsToUse: 'select'
+        #     vstsFeed: '72e4d777-3b02-4ece-99df-3683805cbd5e'
+        #     includeNuGetOrg: false
+
+        - task: PowerShell@2
+          inputs:
+            targetType: 'inline'
+            script: |
+              git reset --hard
+              dotnet restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
+              dotnet build --no-restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
             
         - task: DotNetCoreCLI@2
           inputs:
