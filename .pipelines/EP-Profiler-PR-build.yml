@@ -96,6 +96,7 @@ extends:
           inputs:
             targetType: 'inline'
             script: |
+              git config core.symlinks true
               git reset --hard
               dotnet restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
               dotnet build --no-restore $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
