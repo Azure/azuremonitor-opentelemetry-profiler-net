@@ -123,7 +123,7 @@ extends:
             rootFolderOrFile: '$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/bin/$(BuildConfiguration)/net6.0/publish/'
             includeRootFolder: false
             archiveType: 'zip'
-            archiveFile: '$(Build.SourcesDirectory)/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler.AspNetCore/obj/$(BuildConfiguration)/Uploader/Uploader.zip'
+            archiveFile: '$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler.AspNetCore/obj/$(BuildConfiguration)/Uploader/Uploader.zip'
             replaceExistingArchive: true
             verbose: true
         
@@ -132,7 +132,7 @@ extends:
           inputs:
             command: "pack"
             nobuild: true
-            packagesToPack: src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj
+            packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj
             packDirectory: "$(Build.SourcesDirectory)/packages"
             arguments: '/p:Configuration=$(BuildConfiguration)'
 
