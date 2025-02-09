@@ -76,7 +76,7 @@ extends:
     - stage: build
       displayName: Build the Solution
       jobs:
-      - job: sampleJob
+      - job: mainBuild
         pool:
           type: windows
         variables:
@@ -92,6 +92,7 @@ extends:
             version: '8.x'
 
         - task: PowerShell@2
+          displayName: Set up symlinks
           inputs:
             targetType: 'inline'
             script: |
@@ -99,6 +100,7 @@ extends:
               git reset --hard      
             
         - task: DotNetCoreCLI@2
+          displayName: Restore solution
           inputs:
             command: 'restore'
             projects: $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
@@ -107,18 +109,21 @@ extends:
             includeNuGetOrg: false
 
         - task: DotNetCoreCLI@2
+          displayName: Build solution
           inputs:
             command: 'build'
             projects: '$(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln'
             arguments: '/p:Configuration=$(BuildConfiguration)'
 
         - task: PowerShell@2
+          displayName: Publish uploader
           inputs:
             targetType: 'inline'
             script: |
               dotnet publish $(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/ServiceProfiler.EventPipe.Upload.csproj --no-build --nologo -f net6.0 -c $(BuildConfiguration) --no-restore --disable-build-servers
         
         - task: ArchiveFiles@2
+          displayName: Zip uploader
           inputs:
             rootFolderOrFile: '$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/bin/$(BuildConfiguration)/net6.0/publish/'
             includeRootFolder: false
@@ -128,7 +133,7 @@ extends:
             verbose: true
         
         - task: DotNetCoreCLI@2
-          displayName: "Create ASP.NET Core package"
+          displayName: "Create Core package"
           inputs:
             command: "pack"
             nobuild: true
@@ -145,7 +150,7 @@ extends:
             packDirectory: "$(Build.SourcesDirectory)/packages"
             arguments: '/p:Configuration=$(BuildConfiguration)'
 
-           # Output artifacts
+        # Output artifacts
         - task: CopyFiles@2
           displayName: Copy Binaries - Service Profiler for Linux
           inputs:
