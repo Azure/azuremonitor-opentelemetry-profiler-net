@@ -172,7 +172,7 @@ extends:
           displayName: "Sign NuGet Packages"
           inputs:
             command: "sign"
-            signing_profile: "CP-401405"
+            cp_code: 'CP-401405'
             files_to_sign: '**\*.nupkg'
             search_root: "$(Build.SourcesDirectory)/packages"
 
