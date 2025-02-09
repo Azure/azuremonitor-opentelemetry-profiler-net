@@ -80,7 +80,7 @@ extends:
         pool:
           type: windows
         variables:
-          ob_outputDirectory: '$(REPOROOT)\out'  # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
+          ob_outputDirectory: "$(Build.ArtifactStagingDirectory)/out"  # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
           ob_symbolsPublishing_symbolsFolder: "$(Build.ArtifactStagingDirectory)/out"
         steps:
         - task: NuGetToolInstaller@1
@@ -172,7 +172,7 @@ extends:
         - task: CopyFiles@2
           displayName: "Copy Files for 'Publish Artifacts' publish task"
           inputs:
-            SourceFolder: $(Build.ArtifactStagingDirectory)
+            SourceFolder: $(Build.ArtifactStagingDirectory)\packages
             Contents: "**"
             TargetFolder: $(Build.ArtifactStagingDirectory)/out
           
