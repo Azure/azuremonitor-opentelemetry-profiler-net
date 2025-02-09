@@ -144,6 +144,15 @@ extends:
             packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.csproj
             packDirectory: "$(Build.SourcesDirectory)/packages"
             arguments: '/p:Configuration=$(BuildConfiguration)'
+            
+        # Sign NuGet packages
+        - task: onebranch.pipeline.signing@1
+          displayName: "Sign NuGet Packages"
+          inputs:
+            command: "sign"
+            signing_profile: "external_distribution"
+            files_to_sign: '**\*.nupkg'
+            search_root: "$(Build.SourcesDirectory)/packages"
 
         # Output artifacts
         - task: CopyFiles@2
