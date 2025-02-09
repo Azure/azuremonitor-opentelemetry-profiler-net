@@ -148,7 +148,19 @@ extends:
             archiveFile: '$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler.AspNetCore/obj/$(BuildConfiguration)/Uploader/Uploader.zip'
             replaceExistingArchive: true
             verbose: true
-        
+              
+        # Signing binaries
+        - task: onebranch.pipeline.signing@1
+          displayName: Sign MS Binaries
+          inputs:
+            command: "sign"
+            signing_profile: "external_distribution"
+            files_to_sign: |
+              **/*.exe;
+              **/*.dll;
+              !ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/**;
+            search_root: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel"
+
         - task: DotNetCoreCLI@2
           displayName: "Create Core package"
           inputs:
