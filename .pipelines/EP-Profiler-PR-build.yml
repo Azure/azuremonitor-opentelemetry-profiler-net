@@ -68,9 +68,6 @@ extends:
         break: true  # always break the build on binskim issues in addition to TSA upload
       policheck:
         break: true  # always break the build on policheck issues. You can disable it by setting to 'false'
-      # suppression:
-      #   suppressionFile: $(Build.SourcesDirectory)\.gdn\.gdnsuppress
-      #   suppressionSet: default
 
     stages:
     # The file contains an example HelloWorld script. For more info and examples, see the links below
@@ -113,20 +110,20 @@ extends:
           inputs:
             command: 'build'
             projects: '$(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln'
-            arguments: '--no-restore'
+            arguments: '/p:Configuration=$(BuildConfiguration)'
 
         - task: PowerShell@2
           inputs:
             targetType: 'inline'
             script: |
-              dotnet publish $(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/ServiceProfiler.EventPipe.Upload.csproj --no-build --nologo -f net6.0 --no-restore --disable-build-servers
+              dotnet publish $(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/ServiceProfiler.EventPipe.Upload.csproj --no-build --nologo -f net6.0 -c $(BuildConfiguration) --no-restore --disable-build-servers
         
         - task: ArchiveFiles@2
           inputs:
-            rootFolderOrFile: '$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/bin/Debug/net6.0/publish/'
+            rootFolderOrFile: '$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/bin/$(BuildConfiguration)/net6.0/publish/'
             includeRootFolder: false
             archiveType: 'zip'
-            archiveFile: '$(Build.SourcesDirectory)/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler.AspNetCore/obj/debug/Uploader/Uploader.zip'
+            archiveFile: '$(Build.SourcesDirectory)/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler.AspNetCore/obj/$(BuildConfiguration)/Uploader/Uploader.zip'
             replaceExistingArchive: true
             verbose: true
         
@@ -137,6 +134,7 @@ extends:
             nobuild: true
             packagesToPack: src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj
             packDirectory: "$(Build.SourcesDirectory)/packages"
+            arguments: '/p:Configuration=$(BuildConfiguration)'
 
         - task: DotNetCoreCLI@2
           displayName: "Create ASP.NET Core package"
@@ -145,6 +143,7 @@ extends:
             nobuild: true
             packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.csproj
             packDirectory: "$(Build.SourcesDirectory)/packages"
+            arguments: '/p:Configuration=$(BuildConfiguration)'
 
            # Output artifacts
         - task: CopyFiles@2
