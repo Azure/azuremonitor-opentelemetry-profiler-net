@@ -1,0 +1,179 @@
+#################################################################################
+#                               OneBranch Pipelines                             #
+# This pipeline was created by EasyStart from a sample located at:              #
+#   https://aka.ms/obpipelines/easystart/samples                                #
+# Documentation:  https://aka.ms/obpipelines                                    #
+# Yaml Schema:    https://aka.ms/obpipelines/yaml/schema                        #
+# Retail Tasks:   https://aka.ms/obpipelines/tasks                              #
+# Support:        https://aka.ms/onebranchsup                                   #
+#################################################################################
+
+trigger: none  # https://aka.ms/obpipelines/triggers
+
+# global parameteres are configured here and show up in AzDO UI in build queue time. Required for MSBuild and .NET.
+# learn more at https://aka.ms/obpipelines/parameters
+
+variables:
+  BuildConfiguration: Release
+  BuildPlatform: Any CPU
+  IsSpOfficialBuild: IsSpOfficialBuild=true
+  TeamName: AppInsights-Profiler
+  CDP_DEFINITION_BUILD_COUNT: $[counter('', 0)]  # needed for onebranch.pipeline.version task https://aka.ms/obpipelines/versioning
+  ENABLE_PRS_DELAYSIGN: 1
+  ROOT: $(Build.SourcesDirectory)
+  REPOROOT: $(Build.SourcesDirectory)
+  OUTPUTROOT: $(REPOROOT)\out
+  NUGET_XMLDOC_MODE: none
+  ### Specify container image and other global variables in this section! ###
+  # https://eng.ms/docs/products/onebranch/build/containerbasedworkflow#minimal-required-yaml | This doesn't work for me: https://aka.ms/obpipelines/variables
+  WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2019/vse2022:latest' # for Windows jobs https://aka.ms/obpipelines/containers
+
+resources:
+  repositories:
+  - repository: templates
+    type: git
+    name: OneBranch.Pipelines/GovernedTemplates
+    ref: refs/heads/main
+  - repository: ServiceProfiler 
+    type: git
+    name: OnlineServices/ServiceProfiler 
+    ref: refs/heads/main
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates  # https://aka.ms/obpipelines/templates
+  parameters:
+    git:
+      submodules: true
+    nugetPublishing:
+      feeds:
+        - name: ServiceProfiler
+          continueOnConflict: true
+          files_to_publish: "*.nupkg;!*.symbols.nupkg"
+    globalSdl:  # https://aka.ms/obpipelines/sdl
+      perStage:
+        sdl_sources:
+          checkout_all_repos: true
+      asyncSdl: # https://aka.ms/obpipelines/asyncsdl
+        enabled: false
+      armory:
+        enabled: false
+      tsa:
+        enabled: false  # onebranch publish all SDL results to TSA. If TSA is disabled all SDL tools will forced into 'break' build mode.
+      binskim:
+        break: true  # always break the build on binskim issues in addition to TSA upload
+      policheck:
+        break: true  # always break the build on policheck issues. You can disable it by setting to 'false'
+
+    stages:
+    # The file contains an example HelloWorld script. For more info and examples, see the links below
+    # https://aka.ms/obpipelines/containerbuildexamples
+    # https://aka.ms/obpipelines/containerprojectypes
+    - stage: build
+      displayName: Build the Solution
+      jobs:
+      - job: mainBuild
+        pool:
+          type: windows
+        variables:
+          ob_outputDirectory: "$(Build.ArtifactStagingDirectory)/out"  # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
+          ob_symbolsPublishing_symbolsFolder: "$(Build.ArtifactStagingDirectory)/out"
+        steps:
+        - task: NuGetToolInstaller@1
+          displayName: Use Latest NuGet
+          
+        - task: UseDotNet@2
+          inputs:
+            packageType: 'sdk'
+            version: '8.x'
+
+        - task: PowerShell@2
+          displayName: Set up symlinks
+          inputs:
+            targetType: 'inline'
+            script: |
+              git config core.symlinks true
+              git reset --hard      
+            
+        - task: DotNetCoreCLI@2
+          displayName: Restore solution
+          inputs:
+            command: 'restore'
+            projects: $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
+            feedsToUse: 'select'
+            vstsFeed: '72e4d777-3b02-4ece-99df-3683805cbd5e'
+            includeNuGetOrg: false
+
+        - task: DotNetCoreCLI@2
+          displayName: Build solution
+          inputs:
+            command: 'build'
+            projects: '$(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln'
+            arguments: '/p:Configuration=$(BuildConfiguration)'
+
+        - task: PowerShell@2
+          displayName: Publish uploader
+          inputs:
+            targetType: 'inline'
+            script: |
+              dotnet publish $(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/ServiceProfiler.EventPipe.Upload.csproj --no-build --nologo -f net6.0 -c $(BuildConfiguration) --no-restore --disable-build-servers
+        
+        - task: ArchiveFiles@2
+          displayName: Zip uploader
+          inputs:
+            rootFolderOrFile: '$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/bin/$(BuildConfiguration)/net6.0/publish/'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler.AspNetCore/obj/$(BuildConfiguration)/Uploader/Uploader.zip'
+            replaceExistingArchive: true
+            verbose: true
+        
+        - task: DotNetCoreCLI@2
+          displayName: "Create Core package"
+          inputs:
+            command: "pack"
+            nobuild: true
+            packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj
+            packDirectory: "$(Build.SourcesDirectory)/packages"
+            arguments: '/p:Configuration=$(BuildConfiguration)'
+
+        - task: DotNetCoreCLI@2
+          displayName: "Create ASP.NET Core package"
+          inputs:
+            command: "pack"
+            nobuild: true
+            packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.csproj
+            packDirectory: "$(Build.SourcesDirectory)/packages"
+            arguments: '/p:Configuration=$(BuildConfiguration)'
+
+        # Output artifacts
+        - task: CopyFiles@2
+          displayName: Copy Binaries - Service Profiler for Linux
+          inputs:
+            SourceFolder: $(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel
+            Contents: |
+              **/bin/**
+              # !ServiceProfiler.EventPipe.Upload/**
+              # !!ServiceProfiler.EventPipe.Upload/**/publish/**
+              # !ServiceProfiler.EventPipe.NuGetSigning/bin/**
+              !**/obj/**
+            TargetFolder: '$(Build.ArtifactStagingDirectory)\bin\ServiceProfilerForLinux'
+
+        # Output NuGet packages
+        - task: CopyFiles@2
+          displayName: Copy Nuget Packages
+          inputs:
+            SourceFolder: $(Build.SourcesDirectory)/packages
+            Contents: |
+              **\*.nupkg
+            TargetFolder: $(Build.ArtifactStagingDirectory)\packages
+            flattenFolders: true
+
+        # Publish Artifacts
+        - task: CopyFiles@2
+          displayName: "Copy Files for 'Publish Artifacts' publish task"
+          inputs:
+            SourceFolder: $(Build.ArtifactStagingDirectory)\packages
+            Contents: "**"
+            TargetFolder: $(Build.ArtifactStagingDirectory)/out
+          
+## For info and instructions on CloudTest, see https://aka.ms/obpipelines/cloudtest
