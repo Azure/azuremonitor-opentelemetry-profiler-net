@@ -168,7 +168,7 @@ extends:
             nobuild: true
             packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj
             packDirectory: "$(Build.SourcesDirectory)/packages"
-            arguments: '/p:Configuration=$(BuildConfiguration)'
+            arguments: /p:Configuration=$(BuildConfiguration) /p:$(IsSpOfficialBuild) /p:GeneratePackageOnBuild=false
 
         - task: DotNetCoreCLI@2
           displayName: "Create ASP.NET Core package"
@@ -177,7 +177,7 @@ extends:
             nobuild: true
             packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.csproj
             packDirectory: "$(Build.SourcesDirectory)/packages"
-            arguments: '/p:Configuration=$(BuildConfiguration)'
+            arguments: /p:Configuration=$(BuildConfiguration) /p:$(IsSpOfficialBuild) /p:GeneratePackageOnBuild=false
             
         # Sign NuGet packages
         - task: onebranch.pipeline.signing@1
