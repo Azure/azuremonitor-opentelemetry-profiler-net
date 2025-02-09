@@ -68,9 +68,9 @@ extends:
         break: true  # always break the build on binskim issues in addition to TSA upload
       policheck:
         break: true  # always break the build on policheck issues. You can disable it by setting to 'false'
-      suppression:
-        suppressionFile: $(Build.SourcesDirectory)\.gdn\.gdnsuppress
-        suppressionSet: default
+      # suppression:
+      #   suppressionFile: $(Build.SourcesDirectory)\.gdn\.gdnsuppress
+      #   suppressionSet: default
 
     stages:
     # The file contains an example HelloWorld script. For more info and examples, see the links below
@@ -84,6 +84,7 @@ extends:
           type: windows
         variables:
           ob_outputDirectory: '$(REPOROOT)\out'  # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
+          ob_symbolsPublishing_symbolsFolder: "$(Build.ArtifactStagingDirectory)/out"
         steps:
         - task: NuGetToolInstaller@1
           displayName: Use Latest NuGet
@@ -129,4 +130,51 @@ extends:
             replaceExistingArchive: true
             verbose: true
         
+        - task: DotNetCoreCLI@2
+          displayName: "Create ASP.NET Core package"
+          inputs:
+            command: "pack"
+            nobuild: true
+            packagesToPack: src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj
+            packDirectory: "$(Build.SourcesDirectory)/packages"
+
+        - task: DotNetCoreCLI@2
+          displayName: "Create ASP.NET Core package"
+          inputs:
+            command: "pack"
+            nobuild: true
+            packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.csproj
+            packDirectory: "$(Build.SourcesDirectory)/packages"
+
+           # Output artifacts
+        - task: CopyFiles@2
+          displayName: Copy Binaries - Service Profiler for Linux
+          inputs:
+            SourceFolder: $(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel
+            Contents: |
+              **/bin/**
+              # !ServiceProfiler.EventPipe.Upload/**
+              # !!ServiceProfiler.EventPipe.Upload/**/publish/**
+              # !ServiceProfiler.EventPipe.NuGetSigning/bin/**
+              !**/obj/**
+            TargetFolder: '$(Build.ArtifactStagingDirectory)\bin\ServiceProfilerForLinux'
+
+        # Output NuGet packages
+        - task: CopyFiles@2
+          displayName: Copy Nuget Packages
+          inputs:
+            SourceFolder: $(Build.SourcesDirectory)/packages
+            Contents: |
+              **\*.nupkg
+            TargetFolder: $(Build.ArtifactStagingDirectory)\packages
+            flattenFolders: true
+
+        # Publish Artifacts
+        - task: CopyFiles@2
+          displayName: "Copy Files for 'Publish Artifacts' publish task"
+          inputs:
+            SourceFolder: $(Build.ArtifactStagingDirectory)
+            Contents: "**"
+            TargetFolder: $(Build.ArtifactStagingDirectory)/out
+          
 ## For info and instructions on CloudTest, see https://aka.ms/obpipelines/cloudtest
