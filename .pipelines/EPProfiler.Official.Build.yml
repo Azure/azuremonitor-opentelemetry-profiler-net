@@ -16,7 +16,7 @@ parameters:
   - name: OverwriteVersion
     displayName: Overwrite EventPipe Profiler Package Version
     type: string
-    default: ""
+    default: "default"
   - name: PublishNuGetPackages
     displayName: Publish NuGet Packages
     default: true
@@ -76,4 +76,7 @@ extends:
           PublishNuGetPackages: ${{ parameters.PublishNuGetPackages }}
           PublishSymbols: ${{ parameters.PublishSymbols }}
           BuildType: Official
-          OverwriteVersion: ${{ parameters.OverwriteVersion }}
+          ${{ if eq(parameters.OverwriteVersion, 'default') }}:
+            OverwriteVersion: ""
+          ${{ else }}:
+            OverwriteVersion: ${{ parameters.OverwriteVersion }}

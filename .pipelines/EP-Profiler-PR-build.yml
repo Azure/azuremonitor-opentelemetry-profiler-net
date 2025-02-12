@@ -10,11 +10,6 @@
 
 trigger: none  # https://aka.ms/obpipelines/triggers
 name: $(date:yyyyMMdd)$(rev:.r)
-parameters:
-  - name: OverwriteVersion
-    displayName: Overwrite EventPipe Profiler Package Version
-    type: string
-    default: ""
 
 variables:
   BuildConfiguration: Release
@@ -64,5 +59,4 @@ extends:
       - template: .pipelines/.steps/Agent.EventPipe.Build.yml@ServiceProfiler-EP-Profiler
         parameters:
           BuildType: PR
-          OverwriteVersion: $(OverwriteVersion)
           
