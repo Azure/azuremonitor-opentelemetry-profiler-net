@@ -28,8 +28,8 @@ dotnet nuget add source http://172.179.151.190:5000/v3/index.json
 
 ### 2. Add NuGet Package
 
-To add the `Azure.Monitor.OpenTelemetry.Profiler.AspNetCore` package, run the following command:
+To add the `Azure.Monitor.OpenTelemetry.Profiler` package, run the following command:
 
 ```sh
-dotnet add package Azure.Monitor.OpenTelemetry.Profiler.AspNetCore --prerelease
+dotnet add package Azure.Monitor.OpenTelemetry.Profiler --prerelease
 ```

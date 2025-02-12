@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure.Monitor.OpenTelemetry.Profiler.AspNetCore", "ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.csproj", "{E38F0B1C-E149-49D4-AE4D-AECFC4DAEE69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure.Monitor.OpenTelemetry.Profiler", "ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler\Azure.Monitor.OpenTelemetry.Profiler.csproj", "{E38F0B1C-E149-49D4-AE4D-AECFC4DAEE69}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure.Monitor.OpenTelemetry.Profiler.Core", "ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj", "{1C9A3F25-9286-41A2-98A9-20CE8BFF3B61}"
 EndProject

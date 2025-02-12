@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 using OpenTelemetry;
 using OpenTelemetry.Trace;
 
-namespace Azure.Monitor.OpenTelemetry.Profiler.AspNetCore;
+namespace Azure.Monitor.OpenTelemetry.Profiler;
 
 public static class OpenTelemetryBuilderExtensions
 {

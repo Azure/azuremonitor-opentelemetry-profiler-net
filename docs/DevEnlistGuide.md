@@ -9,50 +9,26 @@ Because of the special settings of the repo, combing symbolic links and submodul
 
 ## Enlist
 
-1. Create a folder of your local repository, for example:
+1. Have your own fork of this repository on GitHub.
+
+1. Assuming you are on Windows, clone the repo, and enable symbolic links
 
     ```shell
-    mkdir OTelProfiler
-    ```
-
-1. In the folder, clone the `ServiceProfiler` repository first:
-
-    ```shell
-    OTelProfiler> git clone https://devdiv.visualstudio.com/DefaultCollection/OnlineServices/_git/ServiceProfiler
-
-    Cloning into 'ServiceProfiler'...
-    remote: Azure Repos
-    remote: Found 147342 objects to send. (1002 ms)
-    Receiving objects:  59% (87870/147342), 315.62 MiB | 41.01 MiB/s
-    ```
-
-    Note: the target folder has to be `ServiceProfiler` under your repo root.
-
-1. Check out the target commit for the submodule:
-
-    ```shell
-    ServiceProfiler> git checkout Commit#
-    ```
-
-    Note: this is a temporary step.
-
-    Find the proper commit to checkout on github:
-
-    ![Github screenshot showing the proper commit.](./images/Submodule_commit.png)
-
-1. Get ready to reestablish the symbolic links in your repo root folder, for example `OTelProfiler`:
-
-    ```shell
-    git init
+    git clone https://github.com/your-github-handle/azuremonitor-opentelemetry-profiler-net.git
+    cd azuremonitor-opentelemetry-profiler-net
     git config core.symlinks true
-    git remote add origin https://github.com/xiaomi7732/Azure.Monitor.OpenTelemetry.Profiler
-    git fetch -p --all
     ```
 
-1. Open another command prompt **as administrator**, and go to the repro root and run:
+1. Pull down the submodules of `ServiceProfiler`
 
     ```shell
-    git checkout main
+    git submodule update --init --progress
+    ```
+
+1. Open another command prompt **as administrator**, and reset the repro:
+
+    ```shell
+    git reset --hard
     exit
     ```
 

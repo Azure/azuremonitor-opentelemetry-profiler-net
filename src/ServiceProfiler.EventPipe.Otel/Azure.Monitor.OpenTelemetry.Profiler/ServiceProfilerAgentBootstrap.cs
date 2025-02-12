@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.ServiceProfiler.Orchestration;
 
-namespace Azure.Monitor.OpenTelemetry.Profiler.AspNetCore;
+namespace Azure.Monitor.OpenTelemetry.Profiler;
 
 internal class ServiceProfilerAgentBootstrap : IServiceProfilerAgentBootstrap
 {
