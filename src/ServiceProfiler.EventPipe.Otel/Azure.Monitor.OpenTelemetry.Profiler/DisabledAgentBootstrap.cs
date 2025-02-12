@@ -4,7 +4,7 @@
 using Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions;
 using Microsoft.Extensions.Logging;
 
-namespace Azure.Monitor.OpenTelemetry.Profiler.AspNetCore;
+namespace Azure.Monitor.OpenTelemetry.Profiler;
 
 internal class DisabledAgentBootstrap(ILogger<DisabledAgentBootstrap> logger) : IServiceProfilerAgentBootstrap
 {

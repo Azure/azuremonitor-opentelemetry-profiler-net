@@ -68,10 +68,11 @@ For additional details on using the GitHub Packages registry, please refer to th
 Add a reference to the latest NuGet packages:
 
 ```sh
-dotnet add package Azure.Monitor.OpenTelemetry.Profiler.AspNetCore --prerelease
+dotnet add package Azure.Monitor.OpenTelemetry.AspNetCore --prerelease
+dotnet add package Azure.Monitor.OpenTelemetry.Profiler --prerelease
 ```
 
-This will automatically add a dependency to `Azure.Monitor.OpenTelemetry.AspNetCore`.
+This will automatically add a dependency to [Azure.Monitor.OpenTelemetry.Exporter](https://www.nuget.org/packages/Azure.Monitor.OpenTelemetry.Exporter).
 
 ### Step 3: Enable Application Insights with OpenTelemetry
 
@@ -84,14 +85,13 @@ Verify that the connection to Application Insights works -- [Confirm Data is Flo
 Append the call to `UseProfiler()` in your code:
 
 ```csharp
-using Azure.Monitor.OpenTelemetry.Profiler.AspNetCore;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
+using Azure.Monitor.OpenTelemetry.Profiler;
 
 ...
-
 builder.Services.AddOpenTelemetry()
         .UseAzureMonitor()
         .UseProfiler();  // Append this line
-
 ...
 ```
 
@@ -112,7 +112,7 @@ info: Microsoft.Hosting.Lifetime[0]
       Hosting environment: Development
 info: Microsoft.Hosting.Lifetime[0]
       Content root path: C:\
-info: Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.ServiceProfilerAgentBootstrap[0]
+info: Azure.Monitor.OpenTelemetry.Profiler.ServiceProfilerAgentBootstrap[0]
       Starting application insights profiler with connection string: InstrumentationKey=5d…
 info: Azure.Monitor.OpenTelemetry.Profiler.Core.DumbTraceControl[0]
       Start writing trace file C:\Users\aaa\AppData\Local\Temp\SPTraces\...

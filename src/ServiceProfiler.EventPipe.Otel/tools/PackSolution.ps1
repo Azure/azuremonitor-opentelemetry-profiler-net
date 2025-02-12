@@ -49,6 +49,11 @@ if ($UseDefaultVersionSuffix) {
     $VersionSuffix = [string](GenerateVersionSuffix -Configuration $Configuration)
 }
 
+# The header project where the user will reference to
+Set-Variable HeaderProjectName -Option Constant -Value "Azure.Monitor.OpenTelemetry.Profiler"
+# The core project hosts shared services that specific to Azure.Monitor.OpenTelemetry.Profiler for the header project to use.
+Set-Variable CoreProjectName -Option Constant -Value "Azure.Monitor.OpenTelemetry.Profiler.Core"
+
 Write-Host "Effective version suffix: $VersionSuffix"
 
 $BaseDir = Split-Path -Parent $PSScriptRoot
@@ -61,23 +66,32 @@ Write-Host "Prepare Output Folder: $OutputDir"
 New-Item -ItemType Directory -Path $OutputDir -Force
 New-Item -ItemType Directory -Path $NuGetOutDir -Force
 
-$CorePackageOutputDir = Join-Path "$BaseDir" "Azure.Monitor.OpenTelemetry.Profiler.Core" "bin" $Configuration
-$AspNetCorePackageOutputDir = Join-Path "$BaseDir" "Azure.Monitor.OpenTelemetry.Profiler.AspNetCore" "bin" $Configuration
+$CorePackageOutputDir = Join-Path "$BaseDir" "$CoreProjectName" "bin" $Configuration
+$AspNetCorePackageOutputDir = Join-Path "$BaseDir" "$HeaderProjectName" "bin" $Configuration
 
 Remove-Item (Join-Path $CorePackageOutputDir *.nupkg) -Force
 Remove-Item (Join-Path $AspNetCorePackageOutputDir *.nupkg) -Force
 
 Write-Host Build the solution
 & $PSScriptRoot\BuildSolution.ps1 $Configuration -Rebuild:$Rebuild
-
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed building the solution."
     EXIT -100
 }
 
 Write-Host "Pack nuget packages"
-dotnet pack (Join-Path $BaseDir "Azure.Monitor.OpenTelemetry.Profiler.Core") --no-build --no-restore --version-suffix $VersionSuffix -c $Configuration
-dotnet pack (Join-Path $BaseDir "Azure.Monitor.OpenTelemetry.Profiler.AspNetCore") --no-build --no-restore --version-suffix $VersionSuffix -c $Configuration
+dotnet pack (Join-Path $BaseDir "$CoreProjectName") --no-build --no-restore --version-suffix $VersionSuffix -c $Configuration
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed creating nuget package: $CoreProjectName"
+    EXIT -101
+}
+
+dotnet pack (Join-Path $BaseDir "$HeaderProjectName") --no-build --no-restore --version-suffix $VersionSuffix -c $Configuration
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed creating nuget package: $HeaderProjectName"
+    EXIT -102
+}
+
 
 $NuGetCoreFileName = GetNuGetPackageFileName -SearchRoot "$CorePackageOutputDir"
 $NuGetAspNetCoreFileName = GetNuGetPackageFileName -SearchRoot "$AspNetCorePackageOutputDir"

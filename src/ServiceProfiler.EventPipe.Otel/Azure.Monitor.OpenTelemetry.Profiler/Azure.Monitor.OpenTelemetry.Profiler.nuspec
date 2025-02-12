@@ -33,8 +33,8 @@
     </contentFiles>
   </metadata>
   <files>
-    <file src="bin\$configuration$\$targetFramework$\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.dll" target="lib/$targetFramework$"></file>
-    <file src="bin\$configuration$\$targetFramework$\Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Azure.Monitor.OpenTelemetry.Profiler.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Azure.Monitor.OpenTelemetry.Profiler.pdb" target="lib/$targetFramework$"></file>
 
     <file src="..\Readme.md" target="docs\" />
     <file src="obj\$configuration$\Uploader\Uploader.zip" target="contentFiles\any\net6.0\ServiceProfiler\TraceUpload.zip"></file>

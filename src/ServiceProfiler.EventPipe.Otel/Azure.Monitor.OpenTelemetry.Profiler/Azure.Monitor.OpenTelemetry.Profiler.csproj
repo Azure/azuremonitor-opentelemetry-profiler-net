@@ -6,9 +6,9 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <NuspecFile>Azure.Monitor.OpenTelemetry.Profiler.AspNetCore.nuspec</NuspecFile>
+    <NuspecFile>Azure.Monitor.OpenTelemetry.Profiler.nuspec</NuspecFile>
     
-    <PackageId>Azure.Monitor.OpenTelemetry.Profiler.AspNetCore</PackageId>
+    <PackageId>Azure.Monitor.OpenTelemetry.Profiler</PackageId>
     <PackageTags>Microsoft Azure Monitor OpenTelemetry Profiler ASP.NET Performance</PackageTags>
     <Description>Library for Azure Monitor OpenTelemetry Profiler for ASP.NET Core.</Description>
     <NuspecProperties> configuration=$(Configuration); id=$(PackageId); description=$(Description); packageTags=$(PackageTags); targetFramework=$(TargetFramework); $(NuspecProperties)

@@ -57,7 +57,7 @@ $UploaderSrcFolder = Join-Path $SolutionDir "ServiceProfiler.EventPipe" "Service
 $UploaderProjectFile = Join-Path $UploaderSrcFolder "ServiceProfiler.EventPipe.Upload.csproj"
 $UploaderTargetFx = "net6.0"
 $UploaderPublishOutput = Join-Path $SolutionDir "ServiceProfiler.EventPipe" "ServiceProfiler.EventPipe.Upload" "bin" "$Configuration" "$UploaderTargetFx" "publish"
-$UploaderArchiveDestinationDir = Join-Path $SolutionDir "ServiceProfiler.EventPipe.Otel" "Azure.Monitor.OpenTelemetry.Profiler.AspNetCore" "obj" "$Configuration" "Uploader"
+$UploaderArchiveDestinationDir = Join-Path $SolutionDir "ServiceProfiler.EventPipe.Otel" "Azure.Monitor.OpenTelemetry.Profiler" "obj" "$Configuration" "Uploader"
 $UploaderArchiveDestination = Join-Path $UploaderArchiveDestinationDir "Uploader.zip"
 dotnet publish $UploaderProjectFile --no-build --nologo -f net6.0 -c $Configuration --no-restore --disable-build-servers
 New-Item -ItemType Directory $UploaderArchiveDestinationDir -Force

@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Azure.Monitor.OpenTelemetry.Profiler.Core" />
-    <InternalsVisibleTo Include="Azure.Monitor.OpenTelemetry.Profiler.AspNetCore" />
+    <InternalsVisibleTo Include="Azure.Monitor.OpenTelemetry.Profiler" />
   </ItemGroup>
   
   <ItemGroup>  
