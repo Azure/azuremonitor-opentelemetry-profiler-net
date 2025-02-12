@@ -9,14 +9,7 @@
 #################################################################################
 
 trigger: none  # https://aka.ms/obpipelines/triggers
-
-# global parameteres are configured here and show up in AzDO UI in build queue time. Required for MSBuild and .NET.
-# learn more at https://aka.ms/obpipelines/parameters
-# parameters:
-# - name: 'debug'
-#  displayName: 'Enable debug output'
-#  type: boolean
-#  default: false
+name: $(date:yyyyMMdd)$(rev:.r)
 
 variables:
   BuildConfiguration: Release
@@ -64,3 +57,6 @@ extends:
       displayName: Build the Solution
       jobs:
       - template: .pipelines/.steps/Agent.EventPipe.Build.yml@ServiceProfiler-EP-Profiler
+        parameters:
+          BuildType: PR
+          

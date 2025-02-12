@@ -13,6 +13,10 @@ name: $(date:yyyyMMdd)$(rev:.r)
 # global parameteres are configured here and show up in AzDO UI in build queue time. Required for MSBuild and .NET.
 # learn more at https://aka.ms/obpipelines/parameters
 parameters:
+  - name: OverwriteVersion
+    displayName: Overwrite EventPipe Profiler Package Version
+    type: string
+    default: "default"
   - name: PublishNuGetPackages
     displayName: Publish NuGet Packages
     default: true
@@ -71,3 +75,8 @@ extends:
         parameters:
           PublishNuGetPackages: ${{ parameters.PublishNuGetPackages }}
           PublishSymbols: ${{ parameters.PublishSymbols }}
+          BuildType: Official
+          ${{ if eq(parameters.OverwriteVersion, 'default') }}:
+            OverwriteVersion: ""
+          ${{ else }}:
+            OverwriteVersion: ${{ parameters.OverwriteVersion }}
