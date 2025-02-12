@@ -119,7 +119,10 @@ jobs:
         nobuild: true
         packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj
         packDirectory: "$(Build.SourcesDirectory)/packages"
-        buildProperties: 'Version=${{ parameters.OverwriteVersion }};VersionSuffix=${{ parameters.BuildType }}-build-$(Build.BuildNumber);'
+        ${{ if eq(parameters.OverwriteVersion, '') }}:
+          buildProperties: 'VersionSuffix=${{ parameters.BuildType }}-build-$(Build.BuildNumber);'
+        ${{ else }}:
+          buildProperties: 'Version=${{ parameters.OverwriteVersion }};VersionSuffix=${{ parameters.BuildType }}-build-$(Build.BuildNumber);'
 
     - task: DotNetCoreCLI@2
       displayName: "Create ASP.NET Core package"
@@ -128,7 +131,10 @@ jobs:
         nobuild: true
         packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler\Azure.Monitor.OpenTelemetry.Profiler.csproj
         packDirectory: "$(Build.SourcesDirectory)/packages"
-        buildProperties: 'Version=${{ parameters.OverwriteVersion }};VersionSuffix=${{ parameters.BuildType }}-build-$(Build.BuildNumber);'
+        ${{ if eq(parameters.OverwriteVersion, '') }}:
+          buildProperties: 'VersionSuffix=${{ parameters.BuildType }}-build-$(Build.BuildNumber);'
+        ${{ else }}:
+          buildProperties: 'Version=${{ parameters.OverwriteVersion }};VersionSuffix=${{ parameters.BuildType }}-build-$(Build.BuildNumber);'
         
     # Sign NuGet packages
     - task: onebranch.pipeline.signing@1
