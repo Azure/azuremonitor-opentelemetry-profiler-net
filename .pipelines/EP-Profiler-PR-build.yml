@@ -1,0 +1,66 @@
+#################################################################################
+#                               OneBranch Pipelines                             #
+# This pipeline was created by EasyStart from a sample located at:              #
+#   https://aka.ms/obpipelines/easystart/samples                                #
+# Documentation:  https://aka.ms/obpipelines                                    #
+# Yaml Schema:    https://aka.ms/obpipelines/yaml/schema                        #
+# Retail Tasks:   https://aka.ms/obpipelines/tasks                              #
+# Support:        https://aka.ms/onebranchsup                                   #
+#################################################################################
+
+trigger: none  # https://aka.ms/obpipelines/triggers
+
+# global parameteres are configured here and show up in AzDO UI in build queue time. Required for MSBuild and .NET.
+# learn more at https://aka.ms/obpipelines/parameters
+# parameters:
+# - name: 'debug'
+#  displayName: 'Enable debug output'
+#  type: boolean
+#  default: false
+
+variables:
+  BuildConfiguration: Release
+  BuildPlatform: Any CPU
+  WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2019/vse2022:latest' # for Windows jobs https://aka.ms/obpipelines/containers
+
+resources:
+  repositories:
+  - repository: templates
+    type: git
+    name: OneBranch.Pipelines/GovernedTemplates
+    ref: refs/heads/main
+  - repository: ServiceProfiler-EP-Profiler
+    type: git
+    name: OnlineServices/ServiceProfiler-EP-Profiler
+    ref: refs/heads/main
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates  # https://aka.ms/obpipelines/templates
+  parameters:
+    git:
+      submodules: true
+    nugetPublishing:
+      feeds:
+        - name: ServiceProfiler
+          continueOnConflict: true
+          files_to_publish: "*.nupkg;!*.symbols.nupkg"
+    globalSdl:  # https://aka.ms/obpipelines/sdl
+      asyncSdl: # https://aka.ms/obpipelines/asyncsdl
+        enabled: false
+      armory:
+        enabled: false
+      tsa:
+        enabled: false  # onebranch publish all SDL results to TSA. If TSA is disabled all SDL tools will forced into 'break' build mode.
+      binskim:
+        break: true  # always break the build on binskim issues in addition to TSA upload
+      policheck:
+        break: true  # always break the build on policheck issues. You can disable it by setting to 'false'
+
+    stages:
+    # The file contains an example HelloWorld script. For more info and examples, see the links below
+    # https://aka.ms/obpipelines/containerbuildexamples
+    # https://aka.ms/obpipelines/containerprojectypes
+    - stage: build
+      displayName: Build the Solution
+      jobs:
+      - template: .pipelines/.steps/Agent.EventPipe.Build.yml@ServiceProfiler-EP-Profiler

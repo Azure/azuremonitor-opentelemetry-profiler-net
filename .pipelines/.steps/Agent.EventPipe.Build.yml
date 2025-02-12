@@ -1,0 +1,163 @@
+parameters:
+  - name: PublishNuGetPackages
+    displayName: Publish NuGet Packages
+    default: false
+    type: boolean
+  - name: PublishSymbols
+    displayName: Publish Symbols
+    type: boolean
+    default: false
+jobs:
+  - job: mainBuild
+    pool:
+      type: windows
+    variables:
+      ob_nugetPublishing_enabled: ${{ parameters.PublishNuGetPackages }}
+      ob_outputDirectory: "$(Build.ArtifactStagingDirectory)/out"  # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
+      ob_symbolsPublishing_symbolsFolder: "$(Build.ArtifactStagingDirectory)/out"
+      ob_symbolsPublishing_enabled: ${{ parameters.PublishSymbols }}
+
+    steps:
+    - task: NuGetToolInstaller@1
+      displayName: Use Latest NuGet
+      
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '8.x'
+
+    - task: PowerShell@2
+      displayName: Set up symlinks
+      inputs:
+        targetType: 'inline'
+        script: |
+          git config core.symlinks true
+          git reset --hard      
+        
+    - task: DotNetCoreCLI@2
+      displayName: Restore solution
+      inputs:
+        command: 'restore'
+        projects: $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
+        selectOrConfig: config
+        nugetConfigPath: NuGet.Config
+
+    - task: DotNetCoreCLI@2
+      displayName: Build solution
+      inputs:
+        command: 'build'
+        projects: '$(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln'
+        arguments: '/p:Configuration=$(BuildConfiguration)'
+
+    - task: DotNetCoreCLI@2
+      displayName: Publish Uploader
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/ServiceProfiler.EventPipe.Upload.csproj'
+        arguments: '--no-build --nologo -f net6.0 -c $(BuildConfiguration) --no-restore --disable-build-servers'
+        zipAfterPublish: false
+        modifyOutputPath: false
+
+    - task: onebranch.pipeline.signing@1
+      displayName: Sign MS Binaries for the Uploader
+      inputs:
+        command: "sign"
+        signing_profile: "external_distribution"
+        files_to_sign: |
+          **/publish/**/*.exe;
+          **/publish/**/*.dll;
+          !**/CommandLine.dll;
+          !**/obj/**;
+        search_root: "$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload"
+
+    - task: onebranch.pipeline.signing@1
+      displayName: Sign 3rd party Binaries for the Uploader
+      inputs:
+        command: "sign"
+        cp_code: "135020002" # certificate Id, this is for 3rd party external distribution, refer to https://onebranch.visualstudio.com/Build/_git/OneBranch.Sign?path=/ESRP/Templates/operations for more details.
+        files_to_sign: |
+          **/publish/**/CommandLine.dll;
+          !**/obj/**;
+        search_root: "$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload"
+
+    - task: ArchiveFiles@2
+      displayName: Zip uploader
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/bin/$(BuildConfiguration)/net6.0/publish/'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler.AspNetCore/obj/$(BuildConfiguration)/Uploader/Uploader.zip'
+        replaceExistingArchive: true
+        verbose: true
+          
+    # Signing binaries
+    - task: onebranch.pipeline.signing@1
+      displayName: Sign MS Binaries
+      inputs:
+        command: "sign"
+        signing_profile: "external_distribution"
+        files_to_sign: |
+          **/*.exe;
+          **/*.dll;
+          !ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/**;
+        search_root: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel"
+
+    - task: DotNetCoreCLI@2
+      displayName: "Create Core package"
+      inputs:
+        command: "pack"
+        nobuild: true
+        packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj
+        packDirectory: "$(Build.SourcesDirectory)/packages"
+        buildProperties: 'VersionSuffix=-build-$(Build.BuildNumber);'
+
+    - task: DotNetCoreCLI@2
+      displayName: "Create ASP.NET Core package"
+      inputs:
+        command: "pack"
+        nobuild: true
+        packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler\Azure.Monitor.OpenTelemetry.Profiler.csproj
+        packDirectory: "$(Build.SourcesDirectory)/packages"
+        buildProperties: 'VersionSuffix=-build-$(Build.BuildNumber);'
+        
+    # Sign NuGet packages
+    - task: onebranch.pipeline.signing@1
+      displayName: "Sign NuGet Packages"
+      inputs:
+        command: "sign"
+        cp_code: 'CP-401405'
+        files_to_sign: '**\*.nupkg'
+        search_root: "$(Build.SourcesDirectory)/packages"
+
+    # Output artifacts
+    - task: CopyFiles@2
+      displayName: Copy Binaries - Service Profiler for Linux
+      inputs:
+        SourceFolder: $(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel
+        Contents: |
+          **/bin/**
+          # !ServiceProfiler.EventPipe.Upload/**
+          # !!ServiceProfiler.EventPipe.Upload/**/publish/**
+          # !ServiceProfiler.EventPipe.NuGetSigning/bin/**
+          !**/obj/**
+        TargetFolder: '$(Build.ArtifactStagingDirectory)\bin\ServiceProfilerForLinux'
+
+    # Output NuGet packages
+    - task: CopyFiles@2
+      displayName: Copy Nuget Packages
+      inputs:
+        SourceFolder: $(Build.SourcesDirectory)/packages
+        Contents: |
+          **\*.nupkg
+        TargetFolder: $(Build.ArtifactStagingDirectory)\packages
+        flattenFolders: true
+
+    # Publish Artifacts
+    - task: CopyFiles@2
+      displayName: "Copy Files for 'Publish Artifacts' publish task"
+      inputs:
+        SourceFolder: $(Build.ArtifactStagingDirectory)
+        Contents: "**"
+        TargetFolder: $(Build.ArtifactStagingDirectory)/out
+      
