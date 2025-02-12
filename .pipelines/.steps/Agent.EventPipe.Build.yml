@@ -52,12 +52,6 @@ jobs:
     - task: DotNetCoreCLI@2
       displayName: Publish Uploader
       inputs:
-        command: 'build'
-        projects: '$(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln'
-        arguments: '/p:Configuration=$(BuildConfiguration)'
-
-    - task: DotNetCoreCLI@2
-      inputs:
         command: 'publish'
         publishWebProjects: false
         projects: '$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/ServiceProfiler.EventPipe.Upload.csproj'
