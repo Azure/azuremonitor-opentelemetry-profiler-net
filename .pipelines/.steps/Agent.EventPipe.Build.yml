@@ -7,6 +7,15 @@ parameters:
     displayName: Publish Symbols
     type: boolean
     default: false
+  - name: BuildType
+    displayName: Type of Build
+    type: string
+    default: PR
+  - name: OverwriteVersion
+    displayName: Overwrite Version
+    type: string
+    default: ""
+
 jobs:
   - job: mainBuild
     pool:
@@ -110,7 +119,7 @@ jobs:
         nobuild: true
         packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj
         packDirectory: "$(Build.SourcesDirectory)/packages"
-        buildProperties: 'VersionSuffix=-build-$(Build.BuildNumber);'
+        buildProperties: 'Version=${{ parameters.OverwriteVersion }};VersionSuffix=${{ parameters.BuildType }}-build-$(Build.BuildNumber);'
 
     - task: DotNetCoreCLI@2
       displayName: "Create ASP.NET Core package"
@@ -119,7 +128,7 @@ jobs:
         nobuild: true
         packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler\Azure.Monitor.OpenTelemetry.Profiler.csproj
         packDirectory: "$(Build.SourcesDirectory)/packages"
-        buildProperties: 'VersionSuffix=-build-$(Build.BuildNumber);'
+        buildProperties: 'Version=${{ parameters.OverwriteVersion }};VersionSuffix=${{ parameters.BuildType }}-build-$(Build.BuildNumber);'
         
     # Sign NuGet packages
     - task: onebranch.pipeline.signing@1
