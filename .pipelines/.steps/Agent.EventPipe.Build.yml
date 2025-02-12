@@ -87,7 +87,7 @@ jobs:
         rootFolderOrFile: '$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/bin/$(BuildConfiguration)/net6.0/publish/'
         includeRootFolder: false
         archiveType: 'zip'
-        archiveFile: '$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler.AspNetCore/obj/$(BuildConfiguration)/Uploader/Uploader.zip'
+        archiveFile: '$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler/obj/$(BuildConfiguration)/Uploader/Uploader.zip'
         replaceExistingArchive: true
         verbose: true
           
