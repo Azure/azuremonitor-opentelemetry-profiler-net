@@ -8,28 +8,27 @@
 # Support:        https://aka.ms/onebranchsup                                   #
 #################################################################################
 
-trigger: none # https://aka.ms/obpipelines/triggers
+trigger: none  # https://aka.ms/obpipelines/triggers
 name: $(date:yyyyMMdd)$(rev:.r)
 
 variables:
   BuildConfiguration: Release
   BuildPlatform: Any CPU
-  WindowsContainerImage: "onebranch.azurecr.io/windows/ltsc2019/vse2022:latest" # for Windows jobs https://aka.ms/obpipelines/containers
-  LinuxContainerImage: "mcr.microsoft.com/onebranch/cbl-mariner/build:2.0"
+  WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2019/vse2022:latest' # for Windows jobs https://aka.ms/obpipelines/containers
 
 resources:
   repositories:
-    - repository: templates
-      type: git
-      name: OneBranch.Pipelines/GovernedTemplates
-      ref: refs/heads/main
-    - repository: ServiceProfiler-EP-Profiler
-      type: git
-      name: OnlineServices/ServiceProfiler-EP-Profiler
-      ref: refs/heads/main
+  - repository: templates
+    type: git
+    name: OneBranch.Pipelines/GovernedTemplates
+    ref: refs/heads/main
+  - repository: ServiceProfiler-EP-Profiler
+    type: git
+    name: OnlineServices/ServiceProfiler-EP-Profiler
+    ref: refs/heads/main
 
 extends:
-  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates # https://aka.ms/obpipelines/templates
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates  # https://aka.ms/obpipelines/templates
   parameters:
     git:
       submodules: true
@@ -38,25 +37,26 @@ extends:
         - name: ServiceProfiler
           continueOnConflict: true
           files_to_publish: "*.nupkg;!*.symbols.nupkg"
-    globalSdl: # https://aka.ms/obpipelines/sdl
+    globalSdl:  # https://aka.ms/obpipelines/sdl
       asyncSdl: # https://aka.ms/obpipelines/asyncsdl
         enabled: false
       armory:
         enabled: false
       tsa:
-        enabled: false # onebranch publish all SDL results to TSA. If TSA is disabled all SDL tools will forced into 'break' build mode.
+        enabled: false  # onebranch publish all SDL results to TSA. If TSA is disabled all SDL tools will forced into 'break' build mode.
       binskim:
-        break: true # always break the build on binskim issues in addition to TSA upload
+        break: true  # always break the build on binskim issues in addition to TSA upload
       policheck:
-        break: true # always break the build on policheck issues. You can disable it by setting to 'false'
+        break: true  # always break the build on policheck issues. You can disable it by setting to 'false'
 
     stages:
-      # The file contains an example HelloWorld script. For more info and examples, see the links below
-      # https://aka.ms/obpipelines/containerbuildexamples
-      # https://aka.ms/obpipelines/containerprojectypes
-      - stage: build
-        displayName: Build the Solution
-        jobs:
-          - template: .pipelines/.steps/Agent.EventPipe.Build.yml@ServiceProfiler-EP-Profiler
-            parameters:
-              BuildType: PR
+    # The file contains an example HelloWorld script. For more info and examples, see the links below
+    # https://aka.ms/obpipelines/containerbuildexamples
+    # https://aka.ms/obpipelines/containerprojectypes
+    - stage: build
+      displayName: Build the Solution
+      jobs:
+      - template: .pipelines/.steps/Agent.EventPipe.Build.yml@ServiceProfiler-EP-Profiler
+        parameters:
+          BuildType: PR
+          
