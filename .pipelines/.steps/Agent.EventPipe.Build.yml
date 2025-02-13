@@ -19,7 +19,7 @@ parameters:
 jobs:
   - job: mainBuild
     pool:
-      type: windows
+      type: linux
     variables:
       ob_nugetPublishing_enabled: ${{ parameters.PublishNuGetPackages }}
       ob_outputDirectory: "$(Build.ArtifactStagingDirectory)/out" # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
