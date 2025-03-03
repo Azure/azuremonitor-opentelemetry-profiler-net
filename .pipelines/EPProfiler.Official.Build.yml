@@ -37,6 +37,10 @@ resources:
     type: git
     name: OneBranch.Pipelines/GovernedTemplates
     ref: refs/heads/main
+  - repository: ServiceProfiler-EP-Profiler 
+    type: git
+    name: OnlineServices/ServiceProfiler-EP-Profiler 
+    ref: ${{ variables['Build.SourceBranch'] }}
 
 extends:
   template: v2/OneBranch.Official.CrossPlat.yml@templates # https://aka.ms/obpipelines/templates
@@ -67,7 +71,7 @@ extends:
     - stage: build
       displayName: Build the Solution
       jobs:
-      - template: .pipelines/.steps/Agent.EventPipe.Build.yml
+      - template: .pipelines/.steps/Agent.EventPipe.Build.yml@ServiceProfiler-EP-Profiler
         parameters:
           PublishNuGetPackages: ${{ parameters.PublishNuGetPackages }}
           PublishSymbols: ${{ parameters.PublishSymbols }}
