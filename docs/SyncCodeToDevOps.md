@@ -25,6 +25,12 @@ This is for internal use only.
     git fetch -p --all                      # Making sure the local repository and the remote are in sync.
     ```
 
+1. Sync the submodules
+
+    ```shell
+    git submodule update --init --progress
+    ```
+
 1. Do a forward integration
 
     ```shell
@@ -40,6 +46,7 @@ This is for internal use only.
     ```
 
     You will see a message telling you that the branch is ready to be merged on the DevOps.
+
 
 1. Use that URL to submit a PR for merging.
 
