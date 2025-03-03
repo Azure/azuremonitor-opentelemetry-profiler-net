@@ -19,15 +19,13 @@
       <group targetFramework="$targetFramework$">
         <!-- Azure Monitor Open Telemetry SDK for application insights -->
         <dependency id="Azure.Monitor.OpenTelemetry.Exporter" version="$AzureMonitorOpenTelemetryExporterVersion$" exclude="Build,Analyzers" />
-        <dependency id="CommandLineParser" version="$commandlineParserVersion$" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Diagnostics.NETCore.Client" version="$MicrosoftDiagnosticsNETCoreClientVersion$" exclude="Build,Analyzers" />
         
         <!-- Other packages -->
+        <dependency id="Azure.Core" version="$azureCoreVersion$" exclude="Build,Analyzers" />
+        <dependency id="CommandLineParser" version="$commandlineParserVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Diagnostics.NETCore.Client" version="$MicrosoftDiagnosticsNETCoreClientVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="$MicrosoftExtensionsConfigurationAbstractionsVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Configuration.Binder" version="$MicrosoftExtensionsConfigurationBinderVersion$" exclude="Build,Analyzers" />
-
-        <!-- Dependencies of Microsoft.ApplicationInsights.Profiler.Shared -->
-        <dependency id="Azure.Core" version="$azureCoreVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Hosting.Abstractions" version="$MicrosoftExtensionsHostingAbstractionsVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Logging.Abstractions" version="$MicrosoftExtensionsLoggingAbstractionsVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Options" version="$MicrosoftExtensionsOptionsVersion$" exclude="Build,Analyzers" />
@@ -62,8 +60,6 @@
     <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Contract.Agent.Profiler.pdb" target="lib/$targetFramework$"></file>
     <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.HttpPipeline.dll" target="lib/$targetFramework$"></file>
     <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.HttpPipeline.pdb" target="lib/$targetFramework$"></file>
-    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Logging.dll" target="lib/$targetFramework$"></file>
-    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Logging.pdb" target="lib/$targetFramework$"></file>
     <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Orchestration.dll" target="lib/$targetFramework$"></file>
     <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Orchestration.pdb" target="lib/$targetFramework$"></file>
     <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.ProcessMonitor.dll" target="lib/$targetFramework$"></file>

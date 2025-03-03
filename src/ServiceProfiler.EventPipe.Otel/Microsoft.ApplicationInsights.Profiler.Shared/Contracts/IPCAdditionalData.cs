@@ -1,3 +1,5 @@
+#nullable enable
+
 using Microsoft.ApplicationInsights.Profiler.Shared.Contracts.CustomEvents;
 using System.Collections.Generic;
 

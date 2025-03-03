@@ -8,7 +8,7 @@ namespace Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions.IP
 /// <summary>
 /// A service to run as a named pipe server.
 /// </summary>
-public interface INamedPipeServerService : INamedPipeOperations
+internal interface INamedPipeServerService : INamedPipeOperations
 {
     /// <summary>
     /// Start a named pipe and wait for connection.

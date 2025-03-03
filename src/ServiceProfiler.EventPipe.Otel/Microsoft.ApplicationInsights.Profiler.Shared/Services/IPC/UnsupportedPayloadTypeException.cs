@@ -2,7 +2,7 @@ using System;
 
 namespace Microsoft.ApplicationInsights.Profiler.Shared.Services.IPC;
 
-public class UnsupportedPayloadTypeException : Exception
+internal class UnsupportedPayloadTypeException : Exception
 {
     public UnsupportedPayloadTypeException() { }
     public UnsupportedPayloadTypeException(string message) : base(message) { }

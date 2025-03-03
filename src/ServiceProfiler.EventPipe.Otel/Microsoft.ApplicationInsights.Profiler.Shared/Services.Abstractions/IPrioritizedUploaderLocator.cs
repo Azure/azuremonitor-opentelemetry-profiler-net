@@ -4,7 +4,7 @@
 
 namespace Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions;
 
-public interface IPrioritizedUploaderLocator
+internal interface IPrioritizedUploaderLocator
 {
     /// <summary>
     /// Sets the priority of the upload locator.

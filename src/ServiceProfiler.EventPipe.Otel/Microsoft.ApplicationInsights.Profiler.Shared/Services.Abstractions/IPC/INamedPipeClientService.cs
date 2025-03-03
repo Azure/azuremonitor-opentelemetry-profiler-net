@@ -1,13 +1,12 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions.IPC;
 
 /// <summary>
-/// A simplied wrapper for NamedPipe client
+/// A simplified wrapper for NamedPipe client
 /// </summary>
-public interface INamedPipeClientService : INamedPipeOperations
+internal interface INamedPipeClientService : INamedPipeOperations
 {
     /// <summary>
     /// Connects to the server with timeout.

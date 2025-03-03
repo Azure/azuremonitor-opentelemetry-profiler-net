@@ -3,7 +3,7 @@ using System.Diagnostics.Tracing;
 namespace Azure.Monitor.OpenTelemetry.Profiler.Core.EventListeners;
 
 [EventSource(Name = EventSourceName)]
-public class AzureMonitorOpenTelemetryProfilerDataAdapterEventSource : EventSource
+internal class AzureMonitorOpenTelemetryProfilerDataAdapterEventSource : EventSource
 {
     public class Keywords
     {

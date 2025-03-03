@@ -9,7 +9,7 @@ namespace Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions;
 /// <summary>
 /// Provides functions to call an external executable.
 /// </summary>
-public interface IOutOfProcCaller
+internal interface IOutOfProcCaller
 {
     /// <summary>
     /// Execute the configured executable, wait until the process finished and return the exit code.

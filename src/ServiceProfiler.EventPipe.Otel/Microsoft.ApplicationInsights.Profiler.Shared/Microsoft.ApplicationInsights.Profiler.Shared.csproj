@@ -17,8 +17,8 @@
     <ProjectReference Include="..\..\ServiceProfiler.Agent.Profiler.FrontendClient.Profiler\Microsoft.ServiceProfiler.Agent.FrontendClient.Profiler.csproj" />
     <ProjectReference Include="..\..\ServiceProfiler.Common.Utilities\ServiceProfiler.Common.Utilities.csproj" />
     <ProjectReference Include="..\..\ServiceProfiler.Contract.Agent\Microsoft.ServiceProfiler.Contract.Agent.csproj" />
-    <ProjectReference Include="..\..\ServiceProfiler.Utilities\ServiceProfiler.Utilities.csproj" />
     <ProjectReference Include="..\..\ServiceProfiler.ProcessMonitor\ServiceProfiler.ProcessMonitor.csproj" />
+    <ProjectReference Include="..\..\ServiceProfiler.Utilities\ServiceProfiler.Utilities.csproj" />
   </ItemGroup>
 
   <ItemGroup>

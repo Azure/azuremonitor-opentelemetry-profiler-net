@@ -4,7 +4,7 @@ using Microsoft.ServiceProfiler.Orchestration;
 
 namespace Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions;
 
-public interface IServiceProfilerProvider
+internal interface IServiceProfilerProvider
 {
     Task<bool> StartServiceProfilerAsync(IProfilerSource source, CancellationToken cancellationToken = default);
 

@@ -1,0 +1,3 @@
+#nullable enable
+Azure.Monitor.OpenTelemetry.Profiler.OpenTelemetryBuilderExtensions
+static Azure.Monitor.OpenTelemetry.Profiler.OpenTelemetryBuilderExtensions.AddAzureMonitorProfiler(this OpenTelemetry.IOpenTelemetryBuilder! builder, System.Action<Azure.Monitor.OpenTelemetry.Profiler.Core.ServiceProfilerOptions!>? configureServiceProfiler = null) -> OpenTelemetry.IOpenTelemetryBuilder!
