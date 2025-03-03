@@ -47,7 +47,6 @@ This is for internal use only.
 
     You will see a message telling you that the branch is ready to be merged on the DevOps.
 
-
 1. Use that URL to submit a PR for merging.
 
     _Notes: do **NOT** use `squash & merge` to avoid introducing conflicts in the future. That should be disabled. But in case it is somehow allowed, do NOT do it._
