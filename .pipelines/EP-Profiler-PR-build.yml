@@ -22,10 +22,6 @@ resources:
     type: git
     name: OneBranch.Pipelines/GovernedTemplates
     ref: refs/heads/main
-  - repository: ServiceProfiler-EP-Profiler
-    type: git
-    name: OnlineServices/ServiceProfiler-EP-Profiler
-    ref: refs/heads/main
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates  # https://aka.ms/obpipelines/templates
@@ -56,7 +52,7 @@ extends:
     - stage: build
       displayName: Build the Solution
       jobs:
-      - template: .pipelines/.steps/Agent.EventPipe.Build.yml@ServiceProfiler-EP-Profiler
+      - template: .pipelines/.steps/Agent.EventPipe.Build.yml
         parameters:
           BuildType: PR
           
