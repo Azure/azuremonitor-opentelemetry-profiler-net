@@ -1,0 +1,3 @@
+#nullable enable
+Azure.Monitor.OpenTelemetry.Profiler.Core.ServiceProfilerOptions
+Azure.Monitor.OpenTelemetry.Profiler.Core.ServiceProfilerOptions.ServiceProfilerOptions() -> void

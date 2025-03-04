@@ -20,12 +20,17 @@
         <!-- Azure Monitor Open Telemetry SDK for application insights -->
         <dependency id="Azure.Monitor.OpenTelemetry.Exporter" version="$AzureMonitorOpenTelemetryExporterVersion$" exclude="Build,Analyzers" />
         
-        <!-- Core package for profiler -->
-        <dependency id="Azure.Monitor.OpenTelemetry.Profiler.Core" version="$version$" exclude="Build,Analyzers" />
-
         <!-- Other packages -->
+        <dependency id="Azure.Core" version="$azureCoreVersion$" exclude="Build,Analyzers" />
+        <dependency id="CommandLineParser" version="$commandlineParserVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Diagnostics.NETCore.Client" version="$MicrosoftDiagnosticsNETCoreClientVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="$MicrosoftExtensionsConfigurationAbstractionsVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Configuration.Binder" version="$MicrosoftExtensionsConfigurationBinderVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Hosting.Abstractions" version="$MicrosoftExtensionsHostingAbstractionsVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="$MicrosoftExtensionsLoggingAbstractionsVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Options" version="$MicrosoftExtensionsOptionsVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.Collections.Immutable" version="$SystemCollectionsImmutableVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Json" version="$SystemTextJsonVersion$" exclude="Build,Analyzers" />
       </group>
     </dependencies>
     <contentFiles>
@@ -36,7 +41,36 @@
     <file src="bin\$configuration$\$targetFramework$\Azure.Monitor.OpenTelemetry.Profiler.dll" target="lib/$targetFramework$"></file>
     <file src="bin\$configuration$\$targetFramework$\Azure.Monitor.OpenTelemetry.Profiler.pdb" target="lib/$targetFramework$"></file>
 
-    <file src="..\Readme.md" target="docs\" />
+    <!-- Project to project references -->
+    <file src="bin\$configuration$\$targetFramework$\Azure.Monitor.OpenTelemetry.Profiler.Core.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Azure.Monitor.OpenTelemetry.Profiler.Core.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ApplicationInsights.Profiler.Shared.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ApplicationInsights.Profiler.Shared.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Agent.Exceptions.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Agent.Exceptions.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Agent.FrontendClient.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Agent.FrontendClient.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Agent.FrontendClient.Profiler.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Agent.FrontendClient.Profiler.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Common.Utilities.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Common.Utilities.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Contract.Agent.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Contract.Agent.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Contract.Agent.Profiler.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Contract.Agent.Profiler.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.HttpPipeline.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.HttpPipeline.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Orchestration.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Orchestration.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.ProcessMonitor.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.ProcessMonitor.pdb" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Utilities.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ServiceProfiler.Utilities.pdb" target="lib/$targetFramework$"></file>
+
+    <!-- Uploader -->
     <file src="obj\$configuration$\Uploader\Uploader.zip" target="contentFiles\any\net6.0\ServiceProfiler\TraceUpload.zip"></file>
+
+    <!-- Readme -->
+    <file src="..\Readme.md" target="docs\" />
   </files>
 </package>

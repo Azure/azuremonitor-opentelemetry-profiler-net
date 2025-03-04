@@ -113,19 +113,7 @@ jobs:
           search_root: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel"
 
       - task: DotNetCoreCLI@2
-        displayName: "Create Core package"
-        inputs:
-          command: "pack"
-          nobuild: true
-          packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj
-          packDirectory: "$(Build.SourcesDirectory)/packages"
-          ${{ if eq(parameters.OverwriteVersion, '') }}:
-            buildProperties: "VersionSuffix=${{ lower(parameters.BuildType) }}-$(Build.BuildNumber);"
-          ${{ else }}:
-            buildProperties: "Version=${{ parameters.OverwriteVersion }}"
-
-      - task: DotNetCoreCLI@2
-        displayName: "Create ASP.NET Core package"
+        displayName: "Create the NuGet package"
         inputs:
           command: "pack"
           nobuild: true
@@ -164,7 +152,7 @@ jobs:
         inputs:
           SourceFolder: $(Build.SourcesDirectory)/packages
           Contents: |
-            **\*.nupkg
+            **\*.*nupkg
           TargetFolder: $(Build.ArtifactStagingDirectory)\packages
           flattenFolders: true
 

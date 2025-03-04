@@ -8,7 +8,7 @@ namespace Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions;
 /// * Be case-insensitive for deserialization.
 /// </summary>
 
-public interface ISerializationProvider
+internal interface ISerializationProvider
 {
     /// <summary>
     /// Tries to serialize an object and output the serialized object.

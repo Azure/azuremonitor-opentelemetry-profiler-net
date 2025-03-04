@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.ApplicationInsights.Profiler.Shared.Orchestrations;
 
-public abstract class EventPipeSchedulingPolicy : SchedulingPolicy
+internal abstract class EventPipeSchedulingPolicy : SchedulingPolicy
 {
     public EventPipeSchedulingPolicy(
         TimeSpan profilingDuration,

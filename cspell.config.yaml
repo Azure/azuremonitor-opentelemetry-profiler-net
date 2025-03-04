@@ -1,0 +1,42 @@
+version: "0.2"
+ignorePaths: []
+dictionaryDefinitions: []
+dictionaries: []
+words:
+  - Authenticode
+  - byos
+  - cooldown
+  - datacube
+  - diagsession
+  - extensionless
+  - HRESULT
+  - Ikey
+  - ikie
+  - inetpub
+  - localstamp
+  - msdl
+  - Namedpipe
+  - netperf
+  - NGEN
+  - profilepath
+  - referencesource
+  - Retriable
+  - WADVM
+  - WEBROOT
+  - wwwroot
+ignoreWords:
+  - artifactkinds
+  - browsable
+  - buildtransitive
+  - contentfiles
+  - coverletcollector
+  - etl
+  - etlupload
+  - gettoken
+  - netstandard
+  - nettrace
+  - profileragent
+  - snapshotagent
+  - spstampcookie
+  - stampid
+import: []

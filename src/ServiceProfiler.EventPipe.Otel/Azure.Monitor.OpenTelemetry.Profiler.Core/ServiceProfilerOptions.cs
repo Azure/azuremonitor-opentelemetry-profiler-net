@@ -11,7 +11,7 @@ public class ServiceProfilerOptions : UserConfigurationBase
     /// <summary>
     /// Gets or sets the connection string.
     /// </summary>
-    public string? ConnectionString { get; set; } = string.Empty;
+    internal string? ConnectionString { get; set; } = string.Empty;
 
     /// <summary>
     /// Get or sets the value of <see cref="TokenCredential" />.
@@ -21,5 +21,5 @@ public class ServiceProfilerOptions : UserConfigurationBase
     /// <remarks>
     /// <see href="https://learn.microsoft.com/en-us/azure/azure-monitor/app/sdk-connection-string?tabs=net#is-the-connection-string-a-secret"/>.
     /// </remarks>
-    public TokenCredential? Credential { get; set; }
+    internal TokenCredential? Credential { get; set; }
 }

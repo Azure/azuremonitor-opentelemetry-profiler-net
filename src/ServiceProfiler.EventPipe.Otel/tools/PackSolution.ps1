@@ -1,3 +1,4 @@
+[CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release')]
     [string]$Configuration = 'Release',
@@ -7,13 +8,12 @@ param(
     [string]$VersionSuffix
 )
 
-function GetNuGetPackageFileName {
+function GetNuGetPackageFileNames {
     param (
         [string]$SearchRoot
     )
-    return (Get-ChildItem -Path ($SearchRoot + "\*.nupkg") -Force -Recurse -File | Select-Object -Last 1).Name
+    return (Get-ChildItem -Path $SearchRoot -Force -Recurse -File -Filter "*.*nupkg" | Select-Object -ExpandProperty Name)
 }
-
 
 function GenerateVersionSuffix {
     param(
@@ -48,13 +48,10 @@ $UseDefaultVersionSuffix = [string]::IsNullOrEmpty($VersionSuffix)
 if ($UseDefaultVersionSuffix) {
     $VersionSuffix = [string](GenerateVersionSuffix -Configuration $Configuration)
 }
+Write-Host "Effective version suffix: $VersionSuffix"
 
 # The header project where the user will reference to
 Set-Variable HeaderProjectName -Option Constant -Value "Azure.Monitor.OpenTelemetry.Profiler"
-# The core project hosts shared services that specific to Azure.Monitor.OpenTelemetry.Profiler for the header project to use.
-Set-Variable CoreProjectName -Option Constant -Value "Azure.Monitor.OpenTelemetry.Profiler.Core"
-
-Write-Host "Effective version suffix: $VersionSuffix"
 
 $BaseDir = Split-Path -Parent $PSScriptRoot
 $SolutionDir = Split-Path -Parent $BaseDir
@@ -66,12 +63,6 @@ Write-Host "Prepare Output Folder: $OutputDir"
 New-Item -ItemType Directory -Path $OutputDir -Force
 New-Item -ItemType Directory -Path $NuGetOutDir -Force
 
-$CorePackageOutputDir = Join-Path "$BaseDir" "$CoreProjectName" "bin" $Configuration
-$AspNetCorePackageOutputDir = Join-Path "$BaseDir" "$HeaderProjectName" "bin" $Configuration
-
-Remove-Item (Join-Path $CorePackageOutputDir *.nupkg) -Force
-Remove-Item (Join-Path $AspNetCorePackageOutputDir *.nupkg) -Force
-
 Write-Host Build the solution
 & $PSScriptRoot\BuildSolution.ps1 $Configuration -Rebuild:$Rebuild
 if ($LASTEXITCODE -ne 0) {
@@ -79,33 +70,29 @@ if ($LASTEXITCODE -ne 0) {
     EXIT -100
 }
 
-Write-Host "Pack nuget packages"
-dotnet pack (Join-Path $BaseDir "$CoreProjectName") --no-build --no-restore --version-suffix $VersionSuffix -c $Configuration
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed creating nuget package: $CoreProjectName"
-    EXIT -101
-}
+# Clean the target folders
+$PackageOutputDir = Join-Path "$BaseDir" "$HeaderProjectName" "bin" $Configuration
+Remove-Item (Join-Path $PackageOutputDir *.*nupkg) -Force
 
+Write-Debug "dotnet pack $(Join-Path $BaseDir "$HeaderProjectName") --no-build --no-restore --version-suffix $VersionSuffix -c $Configuration"
 dotnet pack (Join-Path $BaseDir "$HeaderProjectName") --no-build --no-restore --version-suffix $VersionSuffix -c $Configuration
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed creating nuget package: $HeaderProjectName"
     EXIT -102
 }
 
+$NuGetFileNames = GetNuGetPackageFileNames -SearchRoot "$PackageOutputDir"
+foreach($pkgFile in $NuGetFileNames)
+{
+    $PkgSourceFileName = Join-Path $PackageOutputDir $pkgFile
 
-$NuGetCoreFileName = GetNuGetPackageFileName -SearchRoot "$CorePackageOutputDir"
-$NuGetAspNetCoreFileName = GetNuGetPackageFileName -SearchRoot "$AspNetCorePackageOutputDir"
+    Write-Debug "Copy: $PkgSourceFileName => $NuGetOutDir"
+    XCOPY $PkgSourceFileName $NuGetOutDir /y /f
 
-XCOPY (Join-Path $CorePackageOutputDir $NuGetCoreFileName) $NuGetOutDir /y /f
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed copying the NuGet package file"
-    EXIT -200
-}
-
-XCOPY (Join-Path $AspNetCorePackageOutputDir $NuGetAspNetCoreFileName) $NuGetOutDir /y /f
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed copying the NuGet package file"
-    EXIT -200
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed copying the NuGet package file"
+        EXIT -200
+    }
 }
 
 Write-Host "Package succeeded :-)"
@@ -122,16 +109,13 @@ if ($PushNuGet) {
     New-Item -ItemType Directory -Path $NuGetFeedPath -Force
 
     Push-Location $PSScriptRoot
-    Write-Host "Push NuGet package" (Join-Path $NuGetOutDir $NuGetCoreFileName)
-    # It looks like pushing to feed from localbox is disabled
-    # dotnet nuget push (Join-Path $NuGetOutDir $NuGetCoreFileName) -s https://pkgs.dev.azure.com/devdiv/_packaging/DiagnosticServices/nuget/v3/index.json
-    XCOPY (Join-Path $NuGetOutDir $NuGetCoreFileName) $NuGetFeedPath /y /f
-    Write-Host "Push NuGet package" (Join-Path $NuGetOutDir $NuGetAspNetCoreFileName)
+    Write-Host "Push NuGet package" (Join-Path $NuGetOutDir $NuGetFileName)
     # dotnet nuget push (Join-Path $NuGetOutDir $NuGetAspNetCoreFileName) -s https://pkgs.dev.azure.com/devdiv/_packaging/DiagnosticServices/nuget/v3/index.json
-    XCOPY (Join-Path $NuGetOutDir $NuGetAspNetCoreFileName) $NuGetFeedPath /y /f
+    XCOPY (Join-Path $NuGetOutDir $NuGetFileName) $NuGetFeedPath /y /f
     
     Write-Host Tagging with $VersionSuffix
     git tag $VersionSuffix
-    Write-Host Push the tags by: git push --tags
+    Write-Host "Push the tags by: git push <remoteName> <tagName>"
+    Write-Host "For example: git push origin $VersionSuffix"
     Pop-Location
 }

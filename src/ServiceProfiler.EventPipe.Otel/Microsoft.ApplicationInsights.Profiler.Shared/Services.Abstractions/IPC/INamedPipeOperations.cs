@@ -7,7 +7,7 @@ namespace Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions.IP
 /// <summary>
 /// Common operations that a client or a server could do on a namedpipe.
 /// </summary>
-public interface INamedPipeOperations
+internal interface INamedPipeOperations
 {
     /// <summary>
     /// Gets the name of the pipe

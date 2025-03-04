@@ -29,13 +29,13 @@ using System.Text.Json;
 
 namespace Azure.Monitor.OpenTelemetry.Profiler.Core;
 
-public static class ServiceCollectionExtensions
+internal static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddServiceProfilerCore(this IServiceCollection services)
     {
         // Utilities
         services.AddSingleton<IConnectionStringParserFactory, ConnectionStringParserFactory>();
-        services.AddSingleton<IRoleNameSource, EnvRoleName>();
+        services.AddSingleton<IRoleNameSource, AggregatedRoleNameSource>();
 
 
         services.AddSingleton<IFile, SystemFile>();

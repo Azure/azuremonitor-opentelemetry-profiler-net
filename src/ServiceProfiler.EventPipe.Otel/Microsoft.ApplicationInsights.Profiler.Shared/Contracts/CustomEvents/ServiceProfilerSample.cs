@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 
 namespace Microsoft.ApplicationInsights.Profiler.Shared.Contracts.CustomEvents;

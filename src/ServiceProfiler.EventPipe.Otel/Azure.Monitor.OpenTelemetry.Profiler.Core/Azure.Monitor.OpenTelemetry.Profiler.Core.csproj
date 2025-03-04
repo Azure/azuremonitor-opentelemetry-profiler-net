@@ -17,13 +17,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Core" />
+    <!-- Shipping -->
+    <InternalsVisibleTo Include="Azure.Monitor.OpenTelemetry.Profiler" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" />
     <PackageReference Include="CommandLineParser" />
-    <PackageReference Include="OpenTelemetry" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Microsoft.ApplicationInsights.Profiler.Shared.csproj" />
-    <ProjectReference Include="..\..\ServiceProfiler.ProcessMonitor\ServiceProfiler.ProcessMonitor.csproj" />
   </ItemGroup>
 </Project>

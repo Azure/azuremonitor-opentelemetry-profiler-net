@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.ApplicationInsights.Profiler.Shared.Services.UploaderProxy;
 
-public class OutOfProcCaller : IOutOfProcCaller
+internal class OutOfProcCaller : IOutOfProcCaller
 {
     private readonly ILogger _logger;
     private readonly string _fileName;

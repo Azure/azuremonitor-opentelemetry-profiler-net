@@ -9,31 +9,57 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OpenTelemetry;
-using OpenTelemetry.Trace;
 
 namespace Azure.Monitor.OpenTelemetry.Profiler;
 
 public static class OpenTelemetryBuilderExtensions
 {
     /// <summary>
-    /// Register the services needed to enable Profiler. Use this when IOpenTelemetryBuilder
-    /// is not available.
-    /// </summary>
-    /// <param name="builder">A trace provider builder.</param>
-    /// <param name="configureServiceProfiler">An action to customize the behavior of the profiler.</param>
-    public static TracerProviderBuilder UseProfiler(this TracerProviderBuilder builder, Action<ServiceProfilerOptions>? configureServiceProfiler = null) 
-        => builder.ConfigureServices(services => ConfigureServices(services, configureServiceProfiler));
-
-    /// <summary>
     /// Register the services needed to enable Profiler.
     /// </summary>
     /// <param name="builder">The service container.</param>
     /// <param name="configureServiceProfiler">An action to customize the behavior of the profiler.</param>
-    public static IOpenTelemetryBuilder UseProfiler(this IOpenTelemetryBuilder builder, Action<ServiceProfilerOptions>? configureServiceProfiler = null)
+    public static IOpenTelemetryBuilder AddAzureMonitorProfiler(this IOpenTelemetryBuilder builder, Action<ServiceProfilerOptions>? configureServiceProfiler = null)
     {
+        if (!PreCheck(builder.Services))
+        {
+            // Did not pass the registering check but okay to let the application keep running.
+            return builder;
+        }
+
+        // Passed the registering check, keep registering classes into the 
         ConfigureServices(builder.Services, configureServiceProfiler);
         return builder;
     }
+
+    /// <summary>
+    /// Verify if the register needs to be run.
+    /// There are 2 responsibilities:
+    /// 1. to avoid double registering when called in multiple places.
+    /// 2. to verify that dependency services are there.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns>Returns true when register should continue. Otherwise, false.</returns>
+    /// <exception cref="InvalidOperationException">The application should be interrupted for invalid configurations. Check out the reasons by the message.</exception>
+    private static bool PreCheck(IServiceCollection services)
+    {
+        bool isRegistered = IsRegistered(services);
+        if(isRegistered)
+        {
+            // Fail the pre-check.
+            return false;
+        }
+
+        // TODO: Looking into better ways to check dependencies
+        // It is not very clear what to do today.
+        return true;
+    }
+
+    // The services are treated as registered before when the bootstrap service is registered.
+    // In the future, when we need more complex check, consider injecting the logic than simply update this
+    // implementation.
+    private static bool IsRegistered(IServiceCollection services) =>
+        services.Any(descriptor => descriptor.ServiceType == typeof(IServiceProfilerAgentBootstrap));
 
     private static void ConfigureServices(IServiceCollection services, Action<ServiceProfilerOptions>? configureServiceProfiler)
     {

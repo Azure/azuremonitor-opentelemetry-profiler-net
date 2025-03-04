@@ -27,6 +27,7 @@ internal sealed class ResourceUsageSource : IResourceUsageSource
     private readonly BaselineTracker? _memoryBaselineTracker;
     private readonly UserConfigurationBase _userConfigurations;
     private readonly ILogger _logger;
+    private readonly ILoggerFactory _loggerFactory;
 
     ///<summary>
     /// Aggregates CPU and RAM usage in recent times.
@@ -40,9 +41,12 @@ internal sealed class ResourceUsageSource : IResourceUsageSource
         MemoryTriggerSettings memoryTriggerSettings,
         ISerializationProvider serializer,
         IOptions<UserConfigurationBase> userConfigurations,
-        ILogger<ResourceUsageSource> logger)
+        ILogger<ResourceUsageSource> logger,
+        ILoggerFactory loggerFactory)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+
         _userConfigurations = userConfigurations?.Value ?? throw new ArgumentNullException(nameof(userConfigurations));
 
         if (cpuMetricsProvider is null)
@@ -102,11 +106,12 @@ internal sealed class ResourceUsageSource : IResourceUsageSource
 
     private BaselineTracker CreateAndStartMemoryBaselineTracker(IMetricsProvider memoryMetricsProvider, MemoryTriggerSettings memoryTriggerSettings)
     {
+        // TODO: Fix with ActivatorUtilities
         BaselineTracker memoryBaselineTracker = new(
             new RollingHistoryArray<float>(
                 TimeSpan.FromMinutes(memoryTriggerSettings.MemoryRollingHistorySize),
                 TimeSpan.FromSeconds(memoryTriggerSettings.MemoryRollingHistoryInterval)),
-                TimeSpan.FromSeconds(memoryTriggerSettings.MemoryAverageWindow), memoryMetricsProvider.GetNextValue);
+                TimeSpan.FromSeconds(memoryTriggerSettings.MemoryAverageWindow), memoryMetricsProvider.GetNextValue, _loggerFactory.CreateLogger<BaselineTracker>());
 
         memoryBaselineTracker.RegisterCallback((oldBaseline, newBaseline) =>
         {
@@ -125,7 +130,9 @@ internal sealed class ResourceUsageSource : IResourceUsageSource
             new RollingHistoryArray<float>(
                 TimeSpan.FromMinutes(cpuTriggerSettings.CpuRollingHistorySize),
                 TimeSpan.FromSeconds(cpuTriggerSettings.CpuRollingHistoryInterval)),
-            TimeSpan.FromSeconds(cpuTriggerSettings.CpuAverageWindow), cpuMetricsProvider.GetNextValue);
+            TimeSpan.FromSeconds(cpuTriggerSettings.CpuAverageWindow), 
+            getNextMetric: cpuMetricsProvider.GetNextValue,
+            logger: _loggerFactory.CreateLogger<BaselineTracker>());
 
         cpuBaselineTracker.RegisterCallback((oldBaseline, newBaseline) =>
         {

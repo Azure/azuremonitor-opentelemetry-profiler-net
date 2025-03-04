@@ -1,0 +1,78 @@
+#nullable enable
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem.Arguments.get -> System.Collections.Generic.IDictionary<string!, string!>!
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem.Arguments.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem.EventLevel.get -> System.Diagnostics.Tracing.EventLevel
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem.EventLevel.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem.EventPipeProviderItem() -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem.Keywords.get -> long
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem.Keywords.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem.Name.get -> string!
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem.Name.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem.ToProvider() -> Microsoft.Diagnostics.NETCore.Client.EventPipeProvider!
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.NamedPipeOptions
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.NamedPipeOptions.ConnectionTimeout.get -> System.TimeSpan
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.NamedPipeOptions.ConnectionTimeout.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.NamedPipeOptions.DefaultMessageTimeout.get -> System.TimeSpan
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.NamedPipeOptions.DefaultMessageTimeout.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.NamedPipeOptions.NamedPipeOptions() -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.TraceScavengerServiceOptions
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.TraceScavengerServiceOptions.GracePeriod.get -> System.TimeSpan
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.TraceScavengerServiceOptions.GracePeriod.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.TraceScavengerServiceOptions.InitialDelay.get -> System.TimeSpan
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.TraceScavengerServiceOptions.InitialDelay.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.TraceScavengerServiceOptions.Interval.get -> System.TimeSpan
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.TraceScavengerServiceOptions.Interval.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.TraceScavengerServiceOptions.TraceScavengerServiceOptions() -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UploadMode
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UploadMode.Always = 1 -> Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UploadMode
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UploadMode.Never = -1 -> Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UploadMode
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UploadMode.OnSuccess = 0 -> Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UploadMode
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.AllowsCrash.get -> bool
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.AllowsCrash.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.BufferSizeInMB.get -> int
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.BufferSizeInMB.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.ConfigurationUpdateFrequency.get -> System.TimeSpan
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.ConfigurationUpdateFrequency.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.CPUTriggerCooldown.get -> System.TimeSpan
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.CPUTriggerCooldown.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.CPUTriggerThreshold.get -> float
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.CPUTriggerThreshold.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.CustomEventPipeProviders.get -> System.Collections.Generic.IEnumerable<Microsoft.ApplicationInsights.Profiler.Shared.Contracts.EventPipeProviderItem!>!
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.CustomEventPipeProviders.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.Duration.get -> System.TimeSpan
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.Duration.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.Endpoint.get -> string?
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.Endpoint.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.InitialDelay.get -> System.TimeSpan
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.InitialDelay.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.IsDisabled.get -> bool
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.IsDisabled.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.IsSkipCompatibilityTest.get -> bool
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.IsSkipCompatibilityTest.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.LocalCacheFolder.get -> string!
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.LocalCacheFolder.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.MemoryTriggerCooldown.get -> System.TimeSpan
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.MemoryTriggerCooldown.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.MemoryTriggerThreshold.get -> float
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.MemoryTriggerThreshold.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.NamedPipe.get -> Microsoft.ApplicationInsights.Profiler.Shared.Contracts.NamedPipeOptions!
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.NamedPipe.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.PreserveTraceFile.get -> bool
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.PreserveTraceFile.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.ProvideAnonymousTelemetry.get -> bool
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.ProvideAnonymousTelemetry.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.RandomProfilingOverhead.get -> float
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.RandomProfilingOverhead.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.SkipEndpointCertificateValidation.get -> bool
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.SkipEndpointCertificateValidation.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.StandaloneMode.get -> bool
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.StandaloneMode.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.TraceScavenger.get -> Microsoft.ApplicationInsights.Profiler.Shared.Contracts.TraceScavengerServiceOptions!
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.TraceScavenger.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.UploaderEnvironment.get -> string!
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.UploaderEnvironment.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.UploadMode.get -> Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UploadMode
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.UploadMode.set -> void
+Microsoft.ApplicationInsights.Profiler.Shared.Contracts.UserConfigurationBase.UserConfigurationBase() -> void

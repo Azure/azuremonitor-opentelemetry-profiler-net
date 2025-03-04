@@ -4,10 +4,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <NuspecFile>Azure.Monitor.OpenTelemetry.Profiler.nuspec</NuspecFile>
-    
     <PackageId>Azure.Monitor.OpenTelemetry.Profiler</PackageId>
     <PackageTags>Microsoft Azure Monitor OpenTelemetry Profiler ASP.NET Performance</PackageTags>
     <Description>Library for Azure Monitor OpenTelemetry Profiler for ASP.NET Core.</Description>
@@ -18,12 +17,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Azure.Monitor.OpenTelemetry.Profiler.Core\Azure.Monitor.OpenTelemetry.Profiler.Core.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
-  </ItemGroup>
-
-
 </Project>

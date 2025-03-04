@@ -1,3 +1,4 @@
+[CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release')]
     [Parameter(Mandatory)]

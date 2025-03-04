@@ -5,6 +5,16 @@
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Enable Public API Analyzers by default for all projects under this folder and sub folders -->
+    <EnablePublicAPIAnalyzers Condition=" '$(EnablePublicAPIAnalyzers)' == '' ">true</EnablePublicAPIAnalyzers>
+  </PropertyGroup>
+
+  <!-- Warning as errors -->
+  <PropertyGroup>
+    <WarningsAsErrors>RS0017,RS0016</WarningsAsErrors>
+  </PropertyGroup>
+
   <!-- Determine the version to use -->
   <PropertyGroup>
     <!-- The current release version. -->
@@ -15,10 +25,16 @@
     <Version Condition=" '$(VersionSuffix)' == '' ">$(VersionPrefix)</Version>
   </PropertyGroup>
 
+  <!-- Symbol Package configuration -->
+  <PropertyGroup>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
   <!--Shared Properties for NuGet package-->
   <!--Refer aka.ms/nuget for Microsoft NuGet packages authoring compliance-->
   <PropertyGroup>
-    <!-- Package version is defualt to version. -->
+    <!-- Package version is default to version. -->
     <PackageVersion Condition=" '$(PackageVersion)' == '' ">$(Version)</PackageVersion>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <Authors>Microsoft</Authors>
@@ -36,4 +52,11 @@ version=$(PackageVersion);
 $(NuspecProperties)]]>
     </NuspecProperties>
   </PropertyGroup>
+
+  <ItemGroup Condition=" '$(EnablePublicAPIAnalyzers)' == 'true' ">
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

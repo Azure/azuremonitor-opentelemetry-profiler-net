@@ -4,7 +4,7 @@ namespace Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions.IP
 /// Any serializer implementation that can serialize an object as a payload for named pipe
 /// and deserialize the message back to objects.
 /// </summary>
-public interface IPayloadSerializer
+internal interface IPayloadSerializer
 {
     /// <summary>
     /// Tries to serialize an object and output the serialized object.

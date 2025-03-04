@@ -76,7 +76,7 @@ internal class PostStopProcessor : IPostStopProcessor
     {
         if (uploadMode == UploadMode.Never)
         {
-            _logger.LogInformation("Skip uploading. Uploade mode: {mode}.", uploadMode);
+            _logger.LogInformation("Skip uploading. Upload mode: {mode}.", uploadMode);
             return false;
         }
 
@@ -116,7 +116,7 @@ internal class PostStopProcessor : IPostStopProcessor
                 // Contract with Uploader: Only valid samples are written back.
                 _logger.LogTrace("Waiting for the uploader to write back valid samples according to the contract.");
                 // The uploader might need a while for sample validation before it returns the result. That is especially true under heavy loaded system.
-                // Give it at least 10 minutes as a reasonable timeout. The user could choose to overwrite it with even longer timespan by set up operation timeout.
+                // Give it at least 10 minutes as a reasonable timeout. The user could choose to overwrite it with even longer time span by setting up operation timeout.
                 double longerTimeoutMilliseconds = Math.Max(TimeSpan.FromMinutes(10).TotalMilliseconds, _serviceProfilerOptions.NamedPipe.DefaultMessageTimeout.TotalMilliseconds);
                 e.Samples = (await namedPipeClient.ReadAsync<IEnumerable<SampleActivity>>(timeout: TimeSpan.FromMilliseconds(longerTimeoutMilliseconds)).ConfigureAwait(false)) ?? [];
                 _logger.LogTrace("Finished loading valid samples.");
@@ -149,7 +149,7 @@ internal class PostStopProcessor : IPostStopProcessor
                     {
                         if (e.Samples.Any())
                         {
-                            _logger.LogWarning("Although there are valid samples, there's no additonal data. Why?");
+                            _logger.LogWarning("Although there are valid samples, there's no additional data. Why?");
                         }
                         else
                         {
