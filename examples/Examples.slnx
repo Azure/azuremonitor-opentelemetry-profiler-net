@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/aspnetcore-webapi/">
+    <Project Path="aspnetcore-webapi/SimpleApp.csproj" />
+  </Folder>
+</Solution>
