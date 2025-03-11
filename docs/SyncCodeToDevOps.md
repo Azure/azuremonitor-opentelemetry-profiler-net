@@ -25,6 +25,12 @@ This is for internal use only.
     git fetch -p --all                      # Making sure the local repository and the remote are in sync.
     ```
 
+1. Sync the submodules
+
+    ```shell
+    git submodule update --init --progress
+    ```
+
 1. Do a forward integration
 
     ```shell
