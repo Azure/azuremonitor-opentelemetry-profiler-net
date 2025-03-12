@@ -1,4 +1,6 @@
-# Use Profiler Assemblies Directly
+# [Deprecated] Use Profiler Assemblies Directly
+
+This is for EARLY ACCESS only and is deprecated. Please follow the [Readme](../README.md) and file issues when there are questions.
 
 ## Overview
 

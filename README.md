@@ -1,129 +1,111 @@
-# Azure Monitor OpenTelemetry Profiler for .NET (PREVIEW)
+# Azure Monitor OpenTelemetry Profiler for .NET
+
+| Continuous Integration | Status |
+| ----------- | ----------- |
+| Package | [![Nuget](https://img.shields.io/nuget/v/Azure.Monitor.OpenTelemetry.Profiler)](https://www.nuget.org/packages/Azure.Monitor.OpenTelemetry.Profiler/) |
+| PR Build | [![Build Status](https://dev.azure.com/devdiv/OnlineServices/_apis/build/status%2FOneBranch%2FServiceProfiler%2FBuilds%2FEP-OTel-Profiler-PR?repoName=ServiceProfiler-EP-Profiler&branchName=refs%2Fpull%2F615631%2Fmerge)](https://dev.azure.com/devdiv/OnlineServices/_build/latest?definitionId=25440&repoName=ServiceProfiler-EP-Profiler&branchName=refs%2Fpull%2F615631%2Fmerge) |
+| Official Build | [![Build Status](https://dev.azure.com/devdiv/OnlineServices/_apis/build/status%2FOneBranch%2FServiceProfiler%2FBuilds%2FEP-OTel-Profiler-Official?repoName=ServiceProfiler-EP-Profiler&branchName=main)](https://dev.azure.com/devdiv/OnlineServices/_build/latest?definitionId=25454&repoName=ServiceProfiler-EP-Profiler&branchName=main) |
 
 ## Description
 
-Welcome to the home page of `Azure Monitor OpenTelemetry Profiler for .NET (PREVIEW)`.
+Welcome! Enable profiler, integrate seamlessly with your Application Insights resource, and unlock powerful [Code Optimizations](https://learn.microsoft.com/azure/azure-monitor/insights/code-optimizations-profiler-overview#code-optimizations) for your .NET applications.
+
+> ⭐ Not sure which `Profiler Agent` is right for you? Check out our [Profiler Agent Selection Guide](./docs/ProfilerAgentSelectionGuide.md) to help you choose the best option for your needs.
 
 ## Get Started
 
-### Step 0: Prerequisites
+### Prerequisites
 
-- **.NET 6.0 or later**: Install the latest .NET SDK from [here](https://dotnet.microsoft.com/download/dotnet).
-- **Supported Environments**:
-
-  - Windows
-  - Linux
-  - Containerized apps in Windows or Linux
-  - Azure App Service
+- **.NET 8.0 or later**: Install the latest .NET SDK from [here](https://dotnet.microsoft.com/download/dotnet).
 - **Application Insights Resource**: Follow [this guide](https://learn.microsoft.com/azure/azure-monitor/app/create-workspace-resource#create-a-workspace-based-resource) to create a new Application Insights resource.
+- **Azure Monitor OpenTelemetry**: Profiler works with Azure Monitor OpenTelemetry Activities for analysis.
+  - If you are using `Microsoft.ApplicationInsights.AspNetCore`, please go to [Microsoft Application Insights Profiler for ASP.NET Core](https://github.com/microsoft/ApplicationInsights-Profiler-AspNetCore) for instructions.
 
-### Step 1: Create a .NET Application
+### Walkthrough
 
-If you don't have an app already, you can create a new web API project using the following command:
+Assuming you are building an **ASP.NET Core application**.
 
-```sh
-dotnet new web
-```
+- Create a .NET Application
 
-### Step 2: Restore NuGet Packages
+    If you don't have an app already, create a new web API project using the following command:
 
-Follow the steps below to restore NuGet packages using GitHub Packages as the source registry. If you prefer not to use GitHub Packages or a Personal Access Token (PAT), here are the alternatives:
+    ```sh
+    dotnet new web
+    ```
 
-1. [Restore NuGet Packages from Private Feed](./docs/UseBagetter.md) -- use a temporary private NuGet feed to restore the packages needed
-1. [Use Profiler Assemblies Directly](./docs/UseAssembly.md) -- update the project to reference the assembly files instead of NuGet packages
+- Add NuGet Packages
 
-#### a. Generate a Personal Access Token (PAT)
+    ```sh
+    dotnet add package Azure.Monitor.OpenTelemetry.AspNetCore --prerelease
+    dotnet add package Azure.Monitor.OpenTelemetry.Profiler --prerelease
+    ```
 
- Generate a Personal Access Token (PAT) that will be used to download the NuGet package by following [these instructions](https://docs.github.com/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic).
+    _Tips: optionally, update the package reference in project file to use [floating version](https://learn.microsoft.com/nuget/concepts/dependency-resolution#floating-versions) to stay on top of the latest package. For example, in the **csproj** file:_
 
-Ensure that the Personal Access Token (PAT) has the `read:packages` permission.
+    ```xml
+    <ItemGroup>
+        <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="[1.*-*, 2.0.0)" />
+        <PackageReference Include="Azure.Monitor.OpenTelemetry.Profiler" Version="[1.*-*, 2.0.0)" />
+    </ItemGroup>
+    ```
 
-![PAT read](./images/PAT-read.png)
+- Enable Application Insights with OpenTelemetry
 
-#### b. Add NuGet Source
+  - Follow the [instructions](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=aspnetcore#enable-opentelemetry-with-application-insights) to enable Azure Monitor OpenTelemetry for .NET.
 
-Create a `nuget.config` in your project root with the following content, replacing `your-user-name` with your GitHub username and `GITHUB-PAT` with the PAT from the previous step:
+  - Verify that the connection to Application Insights works -- [Confirm Data is Flowing](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=aspnetcore#confirm-data-is-flowing).
 
-```xml
-<configuration>
-      <packageSources>
-            <!--To inherit the global NuGet package sources remove the <clear/> line below -->
-            <clear />
-            <add key="nuget" value="https://api.nuget.org/v3/index.json" />
-            <add key="github-azure" value="https://nuget.pkg.github.com/Azure/index.json" />  
-      </packageSources>
-      <packageSourceCredentials>
-            <github-azure>
-                  <add key="Username" value="your-user-name" />
-                  <add key="ClearTextPassword" value="GITHUB-PAT" />
-            </github-azure>
-      </packageSourceCredentials>
-</configuration>
-```
+- Enable Profiler
 
-For additional details on using the GitHub Packages registry, please refer to the [documentation](https://docs.github.com/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry#installing-a-package).
+    Append the call to `AddAzureMonitorProfiler()` in your code:
 
-#### c. Add NuGet Package Reference
+    ```csharp
+    using Azure.Monitor.OpenTelemetry.AspNetCore;
+    // Import the Azure.Monitor.OpenTelemetry.Profiler namespace.
+    using Azure.Monitor.OpenTelemetry.Profiler;
 
-Add a reference to the latest NuGet packages:
+    ...
+    builder.Services.AddOpenTelemetry()
+            .UseAzureMonitor()
+            .AddAzureMonitorProfiler();  // Add Azure Monitor Profiler
+    ...
+    ```
 
-```sh
-dotnet add package Azure.Monitor.OpenTelemetry.AspNetCore --prerelease
-dotnet add package Azure.Monitor.OpenTelemetry.Profiler --prerelease
-```
+- Run Your Application
 
-This will automatically add a dependency to [Azure.Monitor.OpenTelemetry.Exporter](https://www.nuget.org/packages/Azure.Monitor.OpenTelemetry.Exporter).
+    Run your application and check the log output. A successful execution will look like this:
 
-### Step 3: Enable Application Insights with OpenTelemetry
+    ```sh
+    PS > dotnet run
 
-Follow the [instructions](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=aspnetcore#enable-opentelemetry-with-application-insights) to enable Azure Monitor OpenTelemetry for .NET.
+    Building...
 
-Verify that the connection to Application Insights works -- [Confirm Data is Flowing](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=aspnetcore#confirm-data-is-flowing).
+    info: Microsoft.Hosting.Lifetime[14]
+        Now listening on: http://localhost:5143
+    info: Microsoft.Hosting.Lifetime[0]
+        Application started. Press Ctrl+C to shut down.
+    info: Microsoft.Hosting.Lifetime[0]
+        Hosting environment: Development
+    info: Microsoft.Hosting.Lifetime[0]
+        Content root path: C:\
+    info: Azure.Monitor.OpenTelemetry.Profiler.ServiceProfilerAgentBootstrap[0]
+        Starting application insights profiler with connection string: InstrumentationKey=5d…
+    info: Azure.Monitor.OpenTelemetry.Profiler.Core.DumbTraceControl[0]
+        Start writing trace file C:\Users\aaa\AppData\Local\Temp\SPTraces\...
+    ...
+    ```
 
-### Step 4: Enable Profiler
+- View Profiler Data
 
-Append the call to `AddAzureMonitorProfiler()` in your code:
+    You can view the profiler data by following [these instructions](https://learn.microsoft.com/azure/azure-monitor/profiler/profiler-data).
 
-```csharp
-using Azure.Monitor.OpenTelemetry.AspNetCore;
-using Azure.Monitor.OpenTelemetry.Profiler;
+    ![sample trace](./images/sample-trace.png)
 
-...
-builder.Services.AddOpenTelemetry()
-        .UseAzureMonitor()
-        .AddAzureMonitorProfiler();  // Append this line
-...
-```
+## Examples
 
-### Step 5: Run Your Application
+Learn more by following the examples:
 
-Run your application and check the log output. A successful execution will look like this:
-
-```sh
-PS > dotnet run
-
-Building...
-
-info: Microsoft.Hosting.Lifetime[14]
-      Now listening on: http://localhost:5143
-info: Microsoft.Hosting.Lifetime[0]
-      Application started. Press Ctrl+C to shut down.
-info: Microsoft.Hosting.Lifetime[0]
-      Hosting environment: Development
-info: Microsoft.Hosting.Lifetime[0]
-      Content root path: C:\
-info: Azure.Monitor.OpenTelemetry.Profiler.ServiceProfilerAgentBootstrap[0]
-      Starting application insights profiler with connection string: InstrumentationKey=5d…
-info: Azure.Monitor.OpenTelemetry.Profiler.Core.DumbTraceControl[0]
-      Start writing trace file C:\Users\aaa\AppData\Local\Temp\SPTraces\...
-...
-```
-
-### Step 6: View Profiler Data
-
-You can view the profiler data by following [these instructions](https://learn.microsoft.com/azure/azure-monitor/profiler/profiler-data).
-
-![sample trace](./images/sample-trace.png)
+- [Enable Azure Monitor OpenTelemetry Profiler in an ASP.NET Core WebAPI](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net/tree/main/examples/aspnetcore-webapi)
 
 ## Contributing
 

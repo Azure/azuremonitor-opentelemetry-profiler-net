@@ -8,7 +8,7 @@
 
     <projectUrl>$projectUrl$</projectUrl>
     <license type="expression">MIT</license>
-    <!-- <icon>icon.png</icon>, see more: https://learn.microsoft.com/en-us/nuget/reference/nuspec#icon -->
+    <icon>images/icon.png</icon>
     <readme>docs/Readme.md</readme>
     <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
     <releaseNotes>$releaseNotes$</releaseNotes>
@@ -72,5 +72,8 @@
 
     <!-- Readme -->
     <file src="..\Readme.md" target="docs\" />
+
+    <!-- Icon -->
+    <file src="..\..\..\images\icon.png" target="images\" />
   </files>
 </package>

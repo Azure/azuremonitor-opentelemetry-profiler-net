@@ -1,4 +1,6 @@
-# Restore NuGet Packages from Private Feed
+# [Deprecated] Restore NuGet Packages from Private Feed
+
+This is for EARLY ACCESS only and is deprecated. Please follow the [Readme](../README.md) and file issues when there are questions.
 
 ## Overview
 
