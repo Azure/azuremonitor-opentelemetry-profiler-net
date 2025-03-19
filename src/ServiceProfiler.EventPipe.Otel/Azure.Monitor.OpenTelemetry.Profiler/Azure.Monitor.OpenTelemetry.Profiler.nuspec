@@ -30,6 +30,7 @@
         <dependency id="Microsoft.Extensions.Logging.Abstractions" version="$MicrosoftExtensionsLoggingAbstractionsVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Options" version="$MicrosoftExtensionsOptionsVersion$" exclude="Build,Analyzers" />
         <dependency id="System.Collections.Immutable" version="$SystemCollectionsImmutableVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.DiagnosticSource" version="$SystemDiagnosticsDiagnosticSourceVersion$" exclude="Build,Analyzers" />
         <dependency id="System.Text.Json" version="$SystemTextJsonVersion$" exclude="Build,Analyzers" />
       </group>
     </dependencies>

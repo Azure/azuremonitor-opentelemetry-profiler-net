@@ -1,55 +1,41 @@
 <Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove(Directory.Packages.props, $(MSBuildThisFileDirectory)..))" />
+
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
+
   <PropertyGroup>
-    <!-- These versions is specific for EventPipe OTel Agent, and will be shared between the build project
-     and the nuget spec as tokens through the property of `NuspecProperties`. -->
-    <AzureCoreVersion>1.44.1</AzureCoreVersion>
-    <AzureMonitorOpenTelemetryExporterVersion>1.4.0-beta.2</AzureMonitorOpenTelemetryExporterVersion>
-    <CommandLineParserVersion>2.9.1</CommandLineParserVersion>
-    <MicrosoftCodeAnalysisPublicApiAnalyzersVersion>3.3.4</MicrosoftCodeAnalysisPublicApiAnalyzersVersion>
-    <MicrosoftDiagnosticsNETCoreClientVersion>0.2.532401</MicrosoftDiagnosticsNETCoreClientVersion>
-    <MicrosoftExtensionsConfigurationAbstractionsVersion>9.0.0</MicrosoftExtensionsConfigurationAbstractionsVersion>
-    <MicrosoftExtensionsConfigurationBinderVersion>9.0.0</MicrosoftExtensionsConfigurationBinderVersion>
-    <MicrosoftExtensionsHostingAbstractionsVersion>9.0.0</MicrosoftExtensionsHostingAbstractionsVersion>
-    <MicrosoftExtensionsLoggingAbstractionsVersion>9.0.0</MicrosoftExtensionsLoggingAbstractionsVersion>
-    <MicrosoftExtensionsOptionsVersion>9.0.0</MicrosoftExtensionsOptionsVersion>
-    <SystemCollectionsImmutableVersion>8.0.0</SystemCollectionsImmutableVersion>
-    <SystemTextJsonVersion>8.0.5</SystemTextJsonVersion>
+    <_AzureMonitorOpenTelemetryExporterVersion>1.4.0-beta.2</_AzureMonitorOpenTelemetryExporterVersion>
+    <_MicrosoftDiagnosticsNETCoreClientVersion>0.2.532401</_MicrosoftDiagnosticsNETCoreClientVersion>
+    <_SystemCollectionsImmutableVersion>8.0.0</_SystemCollectionsImmutableVersion>
+    <_SystemDiagnosticsDiagnosticSourceVersion>9.0.3</_SystemDiagnosticsDiagnosticSourceVersion>
   </PropertyGroup>
+
   <PropertyGroup>
     <NuspecProperties><![CDATA[
-AzureCoreVersion=$(AzureCoreVersion);
-AzureMonitorOpenTelemetryExporterVersion=$(AzureMonitorOpenTelemetryExporterVersion);
-CommandlineParserVersion=$(CommandLineParserVersion);
-MicrosoftDiagnosticsNETCoreClientVersion=$(MicrosoftDiagnosticsNETCoreClientVersion);
-MicrosoftExtensionsConfigurationAbstractionsVersion=$(MicrosoftExtensionsConfigurationAbstractionsVersion); 
-MicrosoftExtensionsConfigurationBinderVersion=$(MicrosoftExtensionsConfigurationBinderVersion);
-MicrosoftExtensionsHostingAbstractionsVersion=$(MicrosoftExtensionsHostingAbstractionsVersion);
-MicrosoftExtensionsLoggingAbstractionsVersion=$(MicrosoftExtensionsLoggingAbstractionsVersion);
-MicrosoftExtensionsOptionsVersion=$(MicrosoftExtensionsOptionsVersion);
-SystemCollectionsImmutableVersion=$(SystemCollectionsImmutableVersion);
-SystemTextJsonVersion=$(SystemTextJsonVersion);
+AzureCoreVersion=$(_AzureCoreVersion);
+AzureMonitorOpenTelemetryExporterVersion=$(_AzureMonitorOpenTelemetryExporterVersion);
+CommandlineParserVersion=$(_CommandLineParserVersion);
+MicrosoftDiagnosticsNETCoreClientVersion=$(_MicrosoftDiagnosticsNETCoreClientVersion);
+MicrosoftExtensionsConfigurationAbstractionsVersion=$(_MicrosoftExtensionsVersion); 
+MicrosoftExtensionsConfigurationBinderVersion=$(_MicrosoftExtensionsVersion);
+MicrosoftExtensionsHostingAbstractionsVersion=$(_MicrosoftExtensionsVersion);
+MicrosoftExtensionsLoggingAbstractionsVersion=$(_MicrosoftExtensionsVersion);
+MicrosoftExtensionsOptionsVersion=$(_MicrosoftExtensionsOptionsVersion);
+SystemCollectionsImmutableVersion=$(_SystemCollectionsImmutableVersion);
+SystemDiagnosticsDiagnosticSourceVersion=$(_SystemDiagnosticsDiagnosticSourceVersion);
+SystemTextJsonVersion=$(_SystemTextJsonVersion);
 $(NuspecProperties)]]></NuspecProperties>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Azure.Core" Version="$(AzureCoreVersion)" />
-    <PackageVersion Include="Azure.Monitor.OpenTelemetry.Exporter" Version="$(AzureMonitorOpenTelemetryExporterVersion)" />
-    <PackageVersion Include="CommandLineParser" Version="$(CommandLineParserVersion)" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageVersion>
-    <PackageVersion Include="Microsoft.Diagnostics.NETCore.Client" Version="$(MicrosoftDiagnosticsNETCoreClientVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(MicrosoftExtensionsConfigurationAbstractionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftExtensionsConfigurationBinderVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(MicrosoftExtensionsHostingAbstractionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="$(MicrosoftExtensionsOptionsVersion)" />
-    <PackageVersion Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" />
-    <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="4.7.0" />
-    <PackageVersion Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
+    <!-- Newly added package compare to the root, notice we use `Include` verb for newly added item. -->
+    <PackageVersion Include="Azure.Monitor.OpenTelemetry.Exporter" Version="$(_AzureMonitorOpenTelemetryExporterVersion)" />
+
+    <!-- Overwrite the versions from the root Directory.Packages.props, notice the verb to be `Update` -->
+    <PackageVersion Update="Microsoft.Diagnostics.NETCore.Client" Version="$(_MicrosoftDiagnosticsNETCoreClientVersion)" />
+    <PackageVersion Update="System.Collections.Immutable" Version="$(_SystemCollectionsImmutableVersion)" />
+    <PackageVersion Update="System.Diagnostics.DiagnosticSource" Version="$(_SystemDiagnosticsDiagnosticSourceVersion)" />
   </ItemGroup>
 </Project>
