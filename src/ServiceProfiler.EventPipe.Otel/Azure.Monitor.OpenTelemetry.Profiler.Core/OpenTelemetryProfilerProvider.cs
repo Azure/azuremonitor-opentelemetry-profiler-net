@@ -24,6 +24,11 @@ internal sealed class OpenTelemetryProfilerProvider : IServiceProfilerProvider, 
     private readonly IServiceProfilerContext _serviceProfilerContext;
     private readonly ILogger<OpenTelemetryProfilerProvider> _logger;
 
+    private const string StartProfilerTriggered = "StartProfiler triggered.";
+    private const string StartProfilerSucceeded = "StartProfiler succeeded.";
+    private const string StopProfilerTriggered = "StopProfiler triggered.";
+    private const string StopProfilerSucceeded = "StopProfiler succeeded.";
+
     private TraceSessionListener? _listener;
 
     public string Source => nameof(OpenTelemetryProfilerProvider);
@@ -66,6 +71,7 @@ internal sealed class OpenTelemetryProfilerProvider : IServiceProfilerProvider, 
         bool profilerStarted = false;
 
         _logger.LogTrace("Got the semaphore. Try starting the Profiler.");
+        _logger.LogInformation(StartProfilerTriggered);
 
         string localCacheFolder = _userCacheManager.TempTraceDirectory.FullName;
         Directory.CreateDirectory(localCacheFolder);
@@ -91,11 +97,17 @@ internal sealed class OpenTelemetryProfilerProvider : IServiceProfilerProvider, 
             throw;
         }
 
+        if (profilerStarted)
+        {
+            _logger.LogInformation(StartProfilerSucceeded);
+        }
+
         return profilerStarted;
     }
 
     public async Task<bool> StopServiceProfilerAsync(IProfilerSource source, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation(StopProfilerTriggered);
         _logger.LogTrace("Entering {StopServiceProfilerAsync}.", nameof(StopServiceProfilerAsync));
 
         bool profilerStopped = false;
@@ -142,6 +154,8 @@ internal sealed class OpenTelemetryProfilerProvider : IServiceProfilerProvider, 
                 stampFrontendHostUrl: _serviceProfilerContext.StampFrontendEndpointUrl,
                 sampleActivities ?? Enumerable.Empty<SampleActivity>(),
                 source), cancellationToken).ConfigureAwait(false);
+
+            _logger.LogInformation(StopProfilerSucceeded);
 
             return true;
         }

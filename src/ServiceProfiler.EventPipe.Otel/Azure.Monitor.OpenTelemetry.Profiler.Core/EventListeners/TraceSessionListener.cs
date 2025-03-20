@@ -4,6 +4,7 @@
 using Microsoft.ApplicationInsights.Profiler.Shared.Samples;
 using Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using System.Diagnostics.Tracing;
 
 namespace Azure.Monitor.OpenTelemetry.Profiler.Core.EventListeners;
@@ -26,6 +27,8 @@ internal class TraceSessionListener : EventListener
 
     public SampleActivityContainer? SampleActivities => _sampleCollector?.SampleActivities;
 
+    private readonly ConcurrentDictionary<string, byte> _startedActivityIds = new();
+
     public TraceSessionListener(
         ISerializationProvider serializer,
         SampleCollector sampleCollector,
@@ -42,7 +45,7 @@ internal class TraceSessionListener : EventListener
 
     protected override void OnEventSourceCreated(EventSource eventSource)
     {
-        // This event might tirgger before the constructor is done.
+        // This event might trigger before the constructor is done.
         TryLogDebug($"Event source creating: {eventSource.Name}");
         // Dispatch this onto a different thread to avoid holding the thread to finish 
         // the constructor
@@ -104,19 +107,19 @@ internal class TraceSessionListener : EventListener
             (eventData.EventId == EventId.RequestStart || eventData.EventId == EventId.RequestStop))
         {
             string requestName = eventData.GetPayload<string>("name") ?? "Unknown";
-            string spanId = eventData.GetPayload<string>("id") ?? throw new InvalidDataException("id payload is missing.");
+            string id = eventData.GetPayload<string>("id") ?? throw new InvalidDataException("id payload is missing.");
 
-            (string operationId, string requestId) = ExtractKeyIds(spanId);
+            (string operationId, string requestId) = ExtractKeyIds(id);
 
             if (eventData.EventId == 24) // Started
             {
-                HandleRequestStart(eventData, requestName, requestId, operationId, spanId);
+                HandleRequestStart(eventData, requestName, requestId, operationId, id);
                 return;
             }
 
             if (eventData.EventId == 25) // Stopped
             {
-                HandleRequestStop(eventData, requestName, requestId, operationId, spanId);
+                HandleRequestStop(eventData, requestName, requestId, operationId, id);
                 return;
             }
         }
@@ -124,7 +127,7 @@ internal class TraceSessionListener : EventListener
 
     private async Task HandleEventSourceCreated(EventSource eventSource)
     {
-        // This has to be the very first statement to making sure the objects are constructured.
+        // This has to be the very first statement to making sure the objects are constructed.
         _ctorWaitHandle.Wait();
 
         try
@@ -147,35 +150,83 @@ internal class TraceSessionListener : EventListener
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error enalbling event source: {name}", eventSource.Name);
+            _logger?.LogError(ex, "Error enabling event source: {name}", eventSource.Name);
         }
     }
 
-    private void HandleRequestStart(EventWrittenEventArgs eventData, string requestName, string requestId, string operationId, string spanId)
+    private bool IsInterestingRequest(string requestName)
+    {
+        // We only are interested capturing Http In requests.
+        // Http request out, for example, from HttpClient will be excluded.
+        return string.Equals("Microsoft.AspNetCore.Hosting.HttpRequestIn", requestName, StringComparison.Ordinal);
+    }
+
+    private void HandleRequestStart(EventWrittenEventArgs eventData, string requestName, string requestId, string operationId, string id)
     {
         Guid currentActivityId = eventData.ActivityId;
-
-        if (_logger.IsEnabled(LogLevel.Debug))
+        bool isDebugLoggingEnabled = _logger.IsEnabled(LogLevel.Debug);
+        if (isDebugLoggingEnabled)
         {
             _logger.LogDebug("Request started: Activity Id: {activityId}", currentActivityId);
         }
 
+        if (!IsInterestingRequest(requestName))
+        {
+            if (isDebugLoggingEnabled)
+            {
+                _logger.LogDebug("Drop uninteresting request by name: {requestName}, id: {id}", requestName, id);
+            }
+
+            // Do not relay this event since it is not interesting.
+            return;
+        }
+
+        // Interesting request
+
+        if (isDebugLoggingEnabled)
+        {
+            _logger.LogDebug("Interesting start activity, name: {name}, id: {id}", requestName, id);
+        }
+
+        // Note to the _startedActivityIds bag, so that when stop happens, it knows to match.
+        if (!_startedActivityIds.TryAdd(id, default))
+        {
+            _logger.LogWarning("Failed to add started activity. Activity by id {id} already exists? Please report a bug.", id);
+        }
+
         AzureMonitorOpenTelemetryProfilerDataAdapterEventSource.Log.RequestStart(
             name: requestName,
-            id: spanId,
+            id: id,
             requestId: requestId,
             operationId: operationId);
     }
 
-    private void HandleRequestStop(EventWrittenEventArgs eventData, string requestName, string requestId, string operationId, string spanId)
+    private void HandleRequestStop(EventWrittenEventArgs eventData, string requestName, string requestId, string operationId, string id)
     {
-        if (_logger.IsEnabled(LogLevel.Debug))
+        bool isDebugLoggingEnabled = _logger.IsEnabled(LogLevel.Debug);
+        if (isDebugLoggingEnabled)
         {
             _logger.LogDebug("Request stopped: Activity Id: {activityId}", eventData.ActivityId);
         }
 
+        if (!_startedActivityIds.TryRemove(id, out _))
+        {
+            if (isDebugLoggingEnabled)
+            {
+                _logger.LogDebug("No start activity found for this stop activity. Request name: {requestName}, id: {id}", requestName, id);
+            }
+
+            // No interesting start activity captured, it then doesn't make sense to just capture the stop.
+            return;
+        }
+
+        if (isDebugLoggingEnabled)
+        {
+            _logger.LogDebug("Interesting activity found. Name: {name}, id: {id}", requestName, id);
+        }
+        // Interesting start activity was captured, relay this stop activity.
         AzureMonitorOpenTelemetryProfilerDataAdapterEventSource.Log.RequestStop(
-            name: requestName, id: spanId, requestId: requestId, operationId: operationId);
+            name: requestName, id: id, requestId: requestId, operationId: operationId);
 
         if (!_hasActivityReported && _logger.IsEnabled(LogLevel.Information))
         {
@@ -202,14 +253,17 @@ internal class TraceSessionListener : EventListener
         _logger.LogDebug(message);
     }
 
-    // span id example: 00-4dee62c12eaa9efca3d1f0565f3efda6-b3c470a7ee10c13b-01
-    private static (string operationId, string requestId) ExtractKeyIds(string spanId)
+    // id example: 00-4dee62c12eaa9efca3d1f0565f3efda6-b3c470a7ee10c13b-01
+    private static (string operationId, string requestId) ExtractKeyIds(string id)
     {
-        string[] tokens = spanId.Split(['-'], StringSplitOptions.RemoveEmptyEntries);
-        if (tokens.Length != 4)
+        string[] tokens = id.Split(['-'], StringSplitOptions.RemoveEmptyEntries);
+        
+        // It at least contains 3 parts.
+        if (tokens.Length < 3)
         {
-            throw new InvalidDataException(FormattableString.Invariant($"Span id shall have 4 sections separated by `-`. Actual: {spanId}"));
+            throw new InvalidDataException(FormattableString.Invariant($"Id shall have at least 3 sections separated by `-`. Actual id: {id}"));
         }
+        
         return (tokens[1], tokens[2]);
     }
 }
