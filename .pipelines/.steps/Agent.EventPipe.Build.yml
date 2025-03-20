@@ -120,9 +120,9 @@ jobs:
           packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler\Azure.Monitor.OpenTelemetry.Profiler.csproj
           packDirectory: "$(Build.SourcesDirectory)/packages"
           ${{ if eq(parameters.OverwriteVersion, '') }}:
-            buildProperties: "VersionSuffix=${{ lower(parameters.BuildType) }}-$(Build.BuildNumber);"
+            buildProperties: "VersionSuffix=${{ lower(parameters.BuildType) }}-$(Build.BuildNumber);SymbolPackageFormat=symbols.nupkg"
           ${{ else }}:
-            buildProperties: "Version=${{ parameters.OverwriteVersion }}"
+            buildProperties: "Version=${{ parameters.OverwriteVersion }};SymbolPackageFormat=symbols.nupkg"
 
       # Sign NuGet packages
       - task: onebranch.pipeline.signing@1
