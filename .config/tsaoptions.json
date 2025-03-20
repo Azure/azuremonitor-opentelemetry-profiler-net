@@ -1,0 +1,10 @@
+{
+    "instanceUrl":  "https://devdiv.visualstudio.com",
+    "TSADocumentation": "https://aka.ms/OBTSA",
+    "projectName":  "OnlineServices",
+    "areaPath":  "OnlineServices\\<Example>\\<Team>\\<AreaPath>",
+    "notificationAliases": ["cweining"],
+    "ppe":  "false",
+    "template":  "TFSMSAzure",
+    "codebaseName":  "TFSMSAzure_ServiceProfiler-EP-Profiler"
+}
