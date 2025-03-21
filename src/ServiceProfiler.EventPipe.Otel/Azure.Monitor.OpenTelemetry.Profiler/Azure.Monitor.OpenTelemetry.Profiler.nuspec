@@ -17,20 +17,18 @@
 
     <dependencies>
       <group targetFramework="$targetFramework$">
-        <!-- Azure Monitor Open Telemetry SDK for application insights -->
+        <dependency id="Azure.Identity" version="$AzureIdentityVersion$" exclude="Build,Analyzers" />
         <dependency id="Azure.Monitor.OpenTelemetry.Exporter" version="$AzureMonitorOpenTelemetryExporterVersion$" exclude="Build,Analyzers" />
-        
-        <!-- Other packages -->
-        <dependency id="Azure.Core" version="$azureCoreVersion$" exclude="Build,Analyzers" />
-        <dependency id="CommandLineParser" version="$commandlineParserVersion$" exclude="Build,Analyzers" />
+        <dependency id="CommandLineParser" version="$CommandLineParserVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Diagnostics.NETCore.Client" version="$MicrosoftDiagnosticsNETCoreClientVersion$" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="$MicrosoftExtensionsConfigurationAbstractionsVersion$" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Extensions.Configuration.Binder" version="$MicrosoftExtensionsConfigurationBinderVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration" version="$MicrosoftExtensionsConfigurationVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Hosting.Abstractions" version="$MicrosoftExtensionsHostingAbstractionsVersion$" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="$MicrosoftExtensionsLoggingAbstractionsVersion$" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Extensions.Options" version="$MicrosoftExtensionsOptionsVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging" version="$MicrosoftExtensionsLoggingVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Options.ConfigurationExtensions" version="$MicrosoftExtensionsOptionsConfigurationExtensionsVersion$" exclude="Build,Analyzers" />
         <dependency id="System.Collections.Immutable" version="$SystemCollectionsImmutableVersion$" exclude="Build,Analyzers" />
-        <dependency id="System.Diagnostics.DiagnosticSource" version="$SystemDiagnosticsDiagnosticSourceVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.PerformanceCounter" version="$SystemDiagnosticsPerformanceCounterVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.Memory.Data" version="$SystemMemoryDataVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.Security.Cryptography.ProtectedData" version="$SystemSecurityCryptographyProtectedDataVersion$" exclude="Build,Analyzers" />
         <dependency id="System.Text.Json" version="$SystemTextJsonVersion$" exclude="Build,Analyzers" />
       </group>
     </dependencies>

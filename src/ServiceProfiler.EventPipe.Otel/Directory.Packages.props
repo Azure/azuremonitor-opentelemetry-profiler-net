@@ -11,21 +11,24 @@
     <_MicrosoftDiagnosticsNETCoreClientVersion>0.2.532401</_MicrosoftDiagnosticsNETCoreClientVersion>
     <_SystemCollectionsImmutableVersion>8.0.0</_SystemCollectionsImmutableVersion>
     <_SystemDiagnosticsDiagnosticSourceVersion>9.0.3</_SystemDiagnosticsDiagnosticSourceVersion>
+    <_SystemMemoryDataVersion>9.0.0</_SystemMemoryDataVersion>
+    <_SystemSecurityCryptographyProtectedDataVersion>9.0.0</_SystemSecurityCryptographyProtectedDataVersion>
   </PropertyGroup>
 
   <PropertyGroup>
     <NuspecProperties><![CDATA[
-AzureCoreVersion=$(_AzureCoreVersion);
+AzureIdentityVersion=$(_AzureIdentityVersion);
 AzureMonitorOpenTelemetryExporterVersion=$(_AzureMonitorOpenTelemetryExporterVersion);
 CommandlineParserVersion=$(_CommandLineParserVersion);
 MicrosoftDiagnosticsNETCoreClientVersion=$(_MicrosoftDiagnosticsNETCoreClientVersion);
-MicrosoftExtensionsConfigurationAbstractionsVersion=$(_MicrosoftExtensionsVersion); 
-MicrosoftExtensionsConfigurationBinderVersion=$(_MicrosoftExtensionsVersion);
+MicrosoftExtensionsConfigurationVersion=$(_MicrosoftExtensionsVersion);
 MicrosoftExtensionsHostingAbstractionsVersion=$(_MicrosoftExtensionsVersion);
-MicrosoftExtensionsLoggingAbstractionsVersion=$(_MicrosoftExtensionsVersion);
-MicrosoftExtensionsOptionsVersion=$(_MicrosoftExtensionsOptionsVersion);
+MicrosoftExtensionsLoggingVersion=$(_MicrosoftExtensionsVersion);
+MicrosoftExtensionsOptionsConfigurationExtensionsVersion=$(_MicrosoftExtensionsVersion);
 SystemCollectionsImmutableVersion=$(_SystemCollectionsImmutableVersion);
-SystemDiagnosticsDiagnosticSourceVersion=$(_SystemDiagnosticsDiagnosticSourceVersion);
+SystemDiagnosticsPerformanceCounterVersion=$(_SystemDiagnosticsPerformanceCounterVersion);
+SystemMemoryDataVersion=$(_SystemMemoryDataVersion);
+SystemSecurityCryptographyProtectedDataVersion=$(_SystemSecurityCryptographyProtectedDataVersion);
 SystemTextJsonVersion=$(_SystemTextJsonVersion);
 $(NuspecProperties)]]></NuspecProperties>
   </PropertyGroup>
