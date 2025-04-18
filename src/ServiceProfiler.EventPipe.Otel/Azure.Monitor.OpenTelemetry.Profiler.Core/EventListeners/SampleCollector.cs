@@ -13,7 +13,6 @@ namespace Azure.Monitor.OpenTelemetry.Profiler.Core.EventListeners;
 
 internal class SampleCollector : EventListener
 {
-    private readonly IServiceProfilerContext _serviceProfilerContext;
     private readonly ISerializationProvider _serializer;
     private readonly ILogger<SampleCollector> _logger;
     private readonly ManualResetEventSlim _ctorWaitHandle = new(false);
@@ -25,7 +24,6 @@ internal class SampleCollector : EventListener
     private static readonly string _targetEventSourceName = AzureMonitorOpenTelemetryProfilerDataAdapterEventSource.EventSourceName;
 
     public SampleCollector(
-        IServiceProfilerContext serviceProfilerContext,
         SampleActivityContainer sampleActivityContainer,
         ISerializationProvider serializer,
         ILogger<SampleCollector> logger)
@@ -33,7 +31,6 @@ internal class SampleCollector : EventListener
         logger.LogTrace("{name} ctor.", nameof(SampleCollector));
 
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _serviceProfilerContext = serviceProfilerContext ?? throw new ArgumentNullException(nameof(serviceProfilerContext));
         SampleActivities = sampleActivityContainer ?? throw new ArgumentNullException(nameof(sampleActivityContainer));
         _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         _ctorWaitHandle.Set();
@@ -42,7 +39,7 @@ internal class SampleCollector : EventListener
 
     protected override void OnEventSourceCreated(EventSource eventSource)
     {
-        // This event might tirgger before the constructor is done.
+        // This event might trigger before the constructor is done.
         TryLogDebug($"Event source creating: {eventSource.Name}");
         // Dispatch this onto a different thread to avoid holding the thread to finish 
         // the constructor
@@ -179,7 +176,6 @@ internal class SampleCollector : EventListener
             activity.OperationName = requestName;
             activity.StopTimeUtc = eventData.TimeStamp;
             activity.Duration = eventData.TimeStamp - activity.StartTimeUtc;
-            activity.RoleInstance = _serviceProfilerContext.MachineName;
             activity.StopActivityIdPath = activityIdPath;
 
             AppendSampleActivity(activity);

@@ -64,7 +64,7 @@ jobs:
           command: "publish"
           publishWebProjects: false
           projects: "$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/ServiceProfiler.EventPipe.Upload.csproj"
-          arguments: "--no-build --nologo -f net6.0 -c $(BuildConfiguration) --no-restore --disable-build-servers"
+          arguments: "--no-build --nologo -c $(BuildConfiguration) --no-restore --disable-build-servers"
           zipAfterPublish: false
           modifyOutputPath: false
 
@@ -93,7 +93,7 @@ jobs:
       - task: ArchiveFiles@2
         displayName: Zip uploader
         inputs:
-          rootFolderOrFile: "$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/bin/$(BuildConfiguration)/net6.0/publish/"
+          rootFolderOrFile: "$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/bin/$(BuildConfiguration)/net8.0/publish/"
           includeRootFolder: false
           archiveType: "zip"
           archiveFile: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler/obj/$(BuildConfiguration)/Uploader/Uploader.zip"

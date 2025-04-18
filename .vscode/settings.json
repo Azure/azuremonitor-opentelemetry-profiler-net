@@ -1,0 +1,4 @@
+{
+  "dotnet.automaticallyCreateSolutionInWorkspace": false,
+  "dotnet.defaultSolution": "${workspaceFolder}/src/Azure.Monitor.OpenTelemetry.Profiler.sln",
+}

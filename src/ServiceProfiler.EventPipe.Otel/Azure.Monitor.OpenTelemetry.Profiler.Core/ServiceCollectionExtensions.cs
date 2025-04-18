@@ -4,6 +4,7 @@
 
 using Azure.Monitor.OpenTelemetry.Profiler.Core.EventListeners;
 using Azure.Monitor.OpenTelemetry.Profiler.Core.Orchestrations;
+using Azure.Monitor.OpenTelemetry.Profiler.Core.Services;
 using Microsoft.ApplicationInsights.Profiler.Core.Utilities;
 using Microsoft.ApplicationInsights.Profiler.Shared.Contracts;
 using Microsoft.ApplicationInsights.Profiler.Shared.Orchestrations;
@@ -14,6 +15,7 @@ using Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions;
 using Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions.Auth;
 using Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions.IPC;
 using Microsoft.ApplicationInsights.Profiler.Shared.Services.IPC;
+using Microsoft.ApplicationInsights.Profiler.Shared.Services.RoleNames;
 using Microsoft.ApplicationInsights.Profiler.Shared.Services.TraceScavenger;
 using Microsoft.ApplicationInsights.Profiler.Shared.Services.UploaderProxy;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,8 +37,20 @@ internal static class ServiceCollectionExtensions
     {
         // Utilities
         services.AddSingleton<IConnectionStringParserFactory, ConnectionStringParserFactory>();
+
+        // Role name detectors and sources
+        services.AddSingleton<OtelResourceDetector>();
+
+        services.AddSingleton<IRoleNameDetector, OtelResourceRoleNameDetector>();
+        services.AddSingleton<IRoleNameDetector, EnvRoleNameDetector>(_ => new EnvRoleNameDetector("WEBSITE_SITE_NAME"));
+        services.AddSingleton<IRoleNameDetector, EnvRoleNameDetector>(_ => new EnvRoleNameDetector("RoleName"));
+        services.AddSingleton<IRoleNameDetector, UnknownRoleNameDetector>();
         services.AddSingleton<IRoleNameSource, AggregatedRoleNameSource>();
 
+        // Role instance detectors and sources
+        services.AddSingleton<IRoleInstanceDetector, ServiceProfilerContextRoleInstanceDetector>();
+        services.AddSingleton<IRoleInstanceDetector, OtelResourceRoleInstanceDetector>();
+        services.AddSingleton<IRoleInstanceSource, AggregatedRoleInstanceSource>();
 
         services.AddSingleton<IFile, SystemFile>();
         services.AddSingleton<IEnvironment, SystemEnvironment>();

@@ -3,16 +3,19 @@ using Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions;
 
 namespace Microsoft.ApplicationInsights.Profiler.Shared.Services;
 
-internal class EnvRoleName : IRoleNameSource
+internal class EnvRoleNameDetector : IRoleNameDetector
 {
-    public EnvRoleName(string envVariableName)
+    private readonly string _envVariableName;
+
+    public EnvRoleNameDetector(string envVariableName)
     {
         if (string.IsNullOrEmpty(envVariableName))
         {
             throw new ArgumentException($"'{nameof(envVariableName)}' cannot be null or empty.", nameof(envVariableName));
         }
 
-        CloudRoleName = Environment.GetEnvironmentVariable(envVariableName);
+        _envVariableName = envVariableName;
     }
-    public string CloudRoleName { get; }
+
+    public string? GetRoleName() => Environment.GetEnvironmentVariable(_envVariableName);
 }

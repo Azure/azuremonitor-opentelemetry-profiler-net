@@ -52,11 +52,4 @@ version=$(PackageVersion);
 $(NuspecProperties)]]>
     </NuspecProperties>
   </PropertyGroup>
-
-  <ItemGroup Condition=" '$(EnablePublicAPIAnalyzers)' == 'true' ">
-    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
 </Project>
