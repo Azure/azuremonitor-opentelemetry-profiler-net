@@ -64,7 +64,7 @@ jobs:
           command: "publish"
           publishWebProjects: false
           projects: "$(Build.SourcesDirectory)/ServiceProfiler/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Upload/ServiceProfiler.EventPipe.Upload.csproj"
-          arguments: "--no-build --nologo -f net8.0 -c $(BuildConfiguration) --no-restore --disable-build-servers"
+          arguments: "--no-build --nologo -c $(BuildConfiguration) --no-restore --disable-build-servers"
           zipAfterPublish: false
           modifyOutputPath: false
 
