@@ -54,10 +54,10 @@ dotnet restore $SolutionPath
 dotnet build -c $Configuration --no-restore $SolutionPath /p:AssemblyVersion=$AssemblyVersion
 
 Write-Host "Archive the Uploader"
-$UploaderSrcFolder = Join-Path $SolutionDir "ServiceProfiler.EventPipe" "ServiceProfiler.EventPipe.Upload"
+$UploaderSrcFolder = Join-Path $SolutionDir "ServiceProfiler.EventPipe.Upload"
 $UploaderProjectFile = Join-Path $UploaderSrcFolder "ServiceProfiler.EventPipe.Upload.csproj"
 $UploaderTargetFx = "net8.0"
-$UploaderPublishOutput = Join-Path $SolutionDir "ServiceProfiler.EventPipe" "ServiceProfiler.EventPipe.Upload" "bin" "$Configuration" "$UploaderTargetFx" "publish"
+$UploaderPublishOutput = Join-Path $SolutionDir "ServiceProfiler.EventPipe.Upload" "bin" "$Configuration" "$UploaderTargetFx" "publish"
 $UploaderArchiveDestinationDir = Join-Path $SolutionDir "ServiceProfiler.EventPipe.Otel" "Azure.Monitor.OpenTelemetry.Profiler" "obj" "$Configuration" "Uploader"
 $UploaderArchiveDestination = Join-Path $UploaderArchiveDestinationDir "Uploader.zip"
 dotnet publish $UploaderProjectFile --no-build --nologo -f $UploaderTargetFx -c $Configuration --no-restore --disable-build-servers

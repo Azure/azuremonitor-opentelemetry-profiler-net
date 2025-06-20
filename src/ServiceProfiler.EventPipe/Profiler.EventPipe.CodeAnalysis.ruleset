@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Basic" ToolsVersion="16.0">
+  <Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
+    <!-- CA1805: Do not initialize unnecessarily. -->
+
+    <Rule Id="CA1805" Action="None" />
+    <!-- CA1822: Mark members as static -->
+    <Rule Id="CA1822" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
+    <!-- CA1303: Do not pass literals as localized parameters -->
+    <Rule Id="CA1303" Action="None" />
+  </Rules>
+</RuleSet>

@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <AssemblyName>Microsoft.ApplicationInsights.Profiler.Logging</AssemblyName>
+        <NoWarn>CA1303;CA1822</NoWarn>
+    </PropertyGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Microsoft.ApplicationInsights.Profiler.AspNetCore" />
+        <InternalsVisibleTo Include="Microsoft.ApplicationInsights.Profiler.Core" />
+        <InternalsVisibleTo Include="Microsoft.ApplicationInsights.Profiler.Uploader" />
+        <InternalsVisibleTo Include="Microsoft.ServiceProfiler.EventPipe.Orchestration" />
+
+        <InternalsVisibleTo Include="ServiceProfiler.EventPipe.Client.Tests" Key="$(TestPublicKey)" />
+        <InternalsVisibleTo Include="ServiceProfiler.EventPipe.Upload.Tests" Key="$(TestPublicKey)" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" Key="$(TestPublicKey)" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+        <!-- Explicit reference for compliance -->
+        <PackageReference Include="Microsoft.AspNetCore.Http" />
+        <PackageReference Include="System.Text.Encodings.Web" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\ServiceProfiler.Common.Utilities\ServiceProfiler.Common.Utilities.csproj" />
+    </ItemGroup>
+</Project>

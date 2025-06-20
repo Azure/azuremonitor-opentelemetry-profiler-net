@@ -20,6 +20,7 @@
 AzureIdentityVersion=$(_AzureIdentityVersion);
 AzureMonitorOpenTelemetryExporterVersion=$(_AzureMonitorOpenTelemetryExporterVersion);
 CommandlineParserVersion=$(_CommandLineParserVersion);
+MicrosoftBclAsyncInterfacesVersion=$(_MicrosoftBclAsyncInterfacesVersion);
 MicrosoftDiagnosticsNETCoreClientVersion=$(_MicrosoftDiagnosticsNETCoreClientVersion);
 MicrosoftExtensionsConfigurationVersion=$(_MicrosoftExtensionsVersion);
 MicrosoftExtensionsHostingAbstractionsVersion=$(_MicrosoftExtensionsVersion);

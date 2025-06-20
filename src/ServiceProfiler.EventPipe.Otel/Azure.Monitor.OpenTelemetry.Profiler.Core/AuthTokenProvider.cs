@@ -1,16 +1,14 @@
 using Azure.Core;
-using Microsoft.ApplicationInsights.Profiler.Shared.Contracts;
-using Microsoft.ApplicationInsights.Profiler.Shared.Services;
-using Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions;
 using Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions.Auth;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ServiceProfiler.Common.Utilities;
 
 namespace Azure.Monitor.OpenTelemetry.Profiler.Core;
 
 internal class AuthTokenProvider(
     IOptions<ServiceProfilerOptions> serviceProfilerOptions,
-    IConnectionStringParserFactory connectionStringParserFactory,
+    ConnectionString connectionString,
     ILogger<AuthTokenProvider> logger) : IAuthTokenProvider
 {
     /// <summary>
@@ -21,7 +19,7 @@ internal class AuthTokenProvider(
     public const string DefaultAadScope = "https://monitor.azure.com//.default";
 
     private readonly ServiceProfilerOptions _serviceProfilerOptions = serviceProfilerOptions?.Value ?? throw new ArgumentNullException(nameof(serviceProfilerOptions));
-    private readonly IConnectionStringParserFactory _connectionStringParserFactory = connectionStringParserFactory ?? throw new ArgumentNullException(nameof(connectionStringParserFactory));
+    private readonly ConnectionString _connectionString = connectionString;
     private readonly ILogger _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public bool IsAADAuthenticateEnabled => _serviceProfilerOptions.Credential is not null;
@@ -51,9 +49,7 @@ internal class AuthTokenProvider(
         string? audience = null;
         if (!string.IsNullOrEmpty(_serviceProfilerOptions.ConnectionString))
         {
-            IConnectionStringParser connectionStringParser = _connectionStringParserFactory.Create(_serviceProfilerOptions.ConnectionString);
-            // OVerwrite the scope according to the connection string when exists.
-            connectionStringParser.TryGetValue(ConnectionStringParser.Keys.AadAudience, out audience);
+            audience = _connectionString.TokenAudience;
         }
         return GetScope(audience);
     }

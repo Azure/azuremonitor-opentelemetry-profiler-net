@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <!--Required metadata-->
+    <id>$id$</id>
+    <version>$version$</version>
+    <description>$description$</description>
+    <authors>$authors$</authors>
+
+    <!--Optional meatadata-->
+    <owners>$owners$</owners>
+    <projectUrl>$projectUrl$</projectUrl>
+    <license type="file">$licenseFileName$</license>
+    <icon>images\$iconFileName$</icon>
+    <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
+    <releaseNotes>$releaseNotes$</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>$packageTags$</tags>
+
+    <dependencies>
+      <group targetFramework="$targetFramework$">
+        <!-- Core package -->
+        <dependency id="Microsoft.ApplicationInsights.Profiler.Core" version="$version$" exclude="Build,Analyzers" />
+        <!-- External Dependencies -->
+        <dependency id="Microsoft.Extensions.Options.ConfigurationExtensions" version="$MicrosoftExtensionsOptionsConfigurationExtensionsVersion$" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <contentFiles>
+      <files include="any\netstandard2.1\ServiceProfiler\TraceUpload.zip" buildAction="None" copyToOutput="true" flatten="true" />
+    </contentFiles>
+  </metadata>
+
+  <files>
+    <!-- License and Icon -->
+    <file src="..\ReleaseResources\$licenseFileName$" target="" />
+    <file src="..\ReleaseResources\$iconFileName$" target="images\" />
+
+    <!--Assemblies-->
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ApplicationInsights.Profiler.AspNetCore.dll" target="lib\$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\Microsoft.ApplicationInsights.Profiler.AspNetCore.pdb" target="lib\$targetFramework$"></file>
+
+    <!--Uploader-->
+    <file src="..\Out\TraceUpload30.zip" target="contentFiles\any\netstandard2.1\ServiceProfiler\TraceUpload.zip"></file>
+  </files>
+</package>

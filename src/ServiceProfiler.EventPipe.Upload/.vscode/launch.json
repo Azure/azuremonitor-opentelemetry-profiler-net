@@ -1,0 +1,40 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build Uploader",
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp2.0/Microsoft.ApplicationInsights.Profiler.Uploader.dll",
+            "args": [
+                "-t",
+                "c:\\temp\\a.etl.zip",
+                "-i",
+                "7d53caf7-ec4d-4a65-ae5d-0519d99569c9",
+                "-d",
+                "7d53caf7-ec4d-4a65-ae5d-0519d99569c9",
+                "--sessionId",
+                "2019-11-20T05:09:59.3690000+00:00",
+                "--host",
+                "https://localhost",
+                "-s",
+                "westus2",
+                "--metadata",
+                "c:\\temp\\metadata.txt"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        }
+    ]
+}

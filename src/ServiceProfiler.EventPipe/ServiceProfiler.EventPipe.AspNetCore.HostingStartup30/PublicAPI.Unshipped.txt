@@ -1,0 +1,4 @@
+#nullable enable
+Microsoft.ApplicationInsights.Profiler.AspNetCore.HostingStartup30.ProfilerBootstrapper
+Microsoft.ApplicationInsights.Profiler.AspNetCore.HostingStartup30.ProfilerBootstrapper.Configure(Microsoft.AspNetCore.Hosting.IWebHostBuilder! builder) -> void
+Microsoft.ApplicationInsights.Profiler.AspNetCore.HostingStartup30.ProfilerBootstrapper.ProfilerBootstrapper() -> void

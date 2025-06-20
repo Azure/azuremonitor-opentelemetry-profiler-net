@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+    <PackageReference Include="FluentAssertions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Please do NOT bump up versions for these following packages without discussion with the team. These are packages with lower version that the end user might have been using.
+      Take package MS.Extensions.DI.Abstraction as an example, we can't explicitly or transitively depend on 5.0.0 because the user might use a lower (3.x) version.
+      Also consider situations the user can't bump up those packages for reasons like running in a class library model on host of Azure Function with .NET Runtime 3.x.
+
+      These packages are added here so that if there's any higher version of the package added by accident, by the dependencies, it will fail the build and give us a chance to review the changes.
+      Bump up packages for these ones will increase the bar for user adoption.
+    -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+
+    <!-- For compliance, using newer versions of Json.NET than the ones on the dependency chain. -->
+    <PackageReference Include="Newtonsoft.Json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ServiceProfiler.Agent.FrontendClient\Microsoft.ServiceProfiler.Agent.FrontendClient.csproj" />
+    <ProjectReference Include="..\..\src\ServiceProfiler.Contract.Agent\Microsoft.ServiceProfiler.Contract.Agent.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.ApplicationInsights.Profiler.Shared\Microsoft.ApplicationInsights.Profiler.Shared.csproj" />
+    <ProjectReference Include="..\..\src\ServiceProfiler.EventPipe\ServiceProfiler.EventPipe.AspNetCore\ServiceProfiler.EventPipe.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\ServiceProfiler.EventPipe\ServiceProfiler.EventPipe.Client\ServiceProfiler.EventPipe.Client.csproj" />
+    <ProjectReference Include="..\..\src\ServiceProfiler.EventPipe\ServiceProfiler.EventPipe.Logging\ServiceProfiler.EventPipe.Logging.csproj" />
+    <ProjectReference Include="..\..\src\ServiceProfiler.Utilities\ServiceProfiler.Utilities.csproj" />
+    <ProjectReference Include="..\..\src\ServiceProfiler.Common.Utilities\ServiceProfiler.Common.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

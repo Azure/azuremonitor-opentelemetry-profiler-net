@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <!--Required metadata-->
+    <id>$id$</id>
+    <version>$version$</version>
+    <description>$description$</description>
+    <authors>$authors$</authors>
+
+    <!--Optional metadata-->
+    <owners>$owners$</owners>
+    <projectUrl>$projectUrl$</projectUrl>
+    <license type="file">$licenseFileName$</license>
+    <icon>images\$iconFileName$</icon>
+    <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
+    <releaseNotes>$releaseNotes$</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>$packageTags$</tags>
+
+    <dependencies>
+      <group targetFramework="$targetFramework$">
+        <dependency id="Azure.Identity" version="$AzureIdentityVersion$" exclude="Build,Analyzers" />
+        <dependency id="CommandLineParser" version="$CommandLineParserVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.ApplicationInsights.AspNetCore" version="$MicrosoftApplicationInsightsAspNetCoreVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.AspNetCore.Hosting" version="$MicrosoftAspNetCoreHostingVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Diagnostics.NETCore.Client" version="$MicrosoftDiagnosticsNETCoreClientVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Caching.Memory" version="$MicrosoftExtensionsCachingMemoryVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration.EnvironmentVariables" version="$MicrosoftExtensionsConfigurationEnvironmentVariablesVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration.Json" version="$MicrosoftExtensionsConfigurationJsonVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Hosting.Abstractions" version="$MicrosoftExtensionsHostingAbstractionsVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Debug" version="$MicrosoftExtensionsLoggingDebugVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.DiagnosticSource" version="$SystemDiagnosticsDiagnosticSourceVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.PerformanceCounter" version="$SystemDiagnosticsPerformanceCounterVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.IdentityModel.Tokens.Jwt" version="$SystemIdentityModelTokensJwtVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.Memory.Data" version="$SystemMemoryDataVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.Security.Cryptography.ProtectedData" version="$SystemSecurityCryptographyProtectedDataVersion$" exclude="Build,Analyzers" />
+        <dependency id="System.ValueTuple" version="$SystemValueTupleVersion$" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- License and Icon -->
+    <file src="..\ReleaseResources\$licenseFileName$" target="" />
+    <file src="..\ReleaseResources\$iconFileName$" target="images\" />
+
+    <!-- All files and symbols -->
+    <file src="bin\$configuration$\$targetFramework$\*.dll" target="lib/$targetFramework$"></file>
+    <file src="bin\$configuration$\$targetFramework$\*.pdb" target="lib/$targetFramework$"></file>
+  </files>
+</package>

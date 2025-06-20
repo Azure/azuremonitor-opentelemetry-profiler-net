@@ -20,6 +20,7 @@
         <dependency id="Azure.Identity" version="$AzureIdentityVersion$" exclude="Build,Analyzers" />
         <dependency id="Azure.Monitor.OpenTelemetry.Exporter" version="$AzureMonitorOpenTelemetryExporterVersion$" exclude="Build,Analyzers" />
         <dependency id="CommandLineParser" version="$CommandLineParserVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Bcl.AsyncInterfaces" version="$MicrosoftBclAsyncInterfacesVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Diagnostics.NETCore.Client" version="$MicrosoftDiagnosticsNETCoreClientVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Configuration" version="$MicrosoftExtensionsConfigurationVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Hosting.Abstractions" version="$MicrosoftExtensionsHostingAbstractionsVersion$" exclude="Build,Analyzers" />

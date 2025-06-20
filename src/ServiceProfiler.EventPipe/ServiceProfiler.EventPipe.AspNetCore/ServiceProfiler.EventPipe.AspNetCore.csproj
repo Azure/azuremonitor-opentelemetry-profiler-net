@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <AssemblyName>Microsoft.ApplicationInsights.Profiler.AspNetCore</AssemblyName>
+        <NoWarn>CA1303;CA1822</NoWarn>
+    </PropertyGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Microsoft.ApplicationInsights.Profiler.HostingStartup30" />
+      
+        <InternalsVisibleTo Include="ServiceProfiler.EventPipe.Client.Tests" Key="$(TestPublicKey)" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" Key="$(TestPublicKey)" />
+    </ItemGroup>
+    <PropertyGroup Condition=" '$(IsSpOfficialBuild)' == 'true' ">
+        <!--Only generate nuget packages on server build-->
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <IncludeSymbols>false</IncludeSymbols>
+    </PropertyGroup>
+    <!--NuGet package properties-->
+    <PropertyGroup>
+        <Version Condition=" '$(Version)' == '' ">1.0.0</Version>
+        <NuspecFile>ServiceProfiler.EventPipe.AspNetCore.nuspec</NuspecFile>
+        <PackageId>Microsoft.ApplicationInsights.Profiler.AspNetCore</PackageId>
+        <Description>Microsoft Application Insights Profiler for ASP.NET Core.</Description>
+        <PackageTags>Microsoft Azure Service Profiler AspNet AspNetCore Linux Windows Performance Stack Trace Docker ServiceProfiler LinuxProfiler LinuxPerformance AspNetCoreProfiler AspNetCorePerformance DockerProfiler</PackageTags>
+        <NuspecProperties><![CDATA[
+configuration=$(Configuration);
+id=$(PackageId);
+version=$(Version);
+description=$(Description);
+packageTags=$(PackageTags);
+targetFramework=$(TargetFramework);
+MicrosoftExtensionsOptionsConfigurationExtensionsVersion=$(_MicrosoftExtensionsOptionsConfigurationExtensionsVersion);
+$(NuspecProperties)]]>
+    </NuspecProperties>
+    </PropertyGroup>
+    <ItemGroup>
+        <!-- Whenever there's new package, please update the nuspec accordingly until we figure out a way to get rid of the nuspec files. -->
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
+        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" />
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Include="Microsoft.Extensions.Options" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+        <PackageReference Include="System.Diagnostics.PerformanceCounter" />
+        <!-- Explicit package reference for compliance -->
+        <PackageReference Include="Microsoft.AspNetCore.Http" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Microsoft.ServiceProfiler.Orchestration\Microsoft.ServiceProfiler.Orchestration.csproj" />
+        <ProjectReference Include="..\..\ServiceProfiler.Agent.FrontendClient\Microsoft.ServiceProfiler.Agent.FrontendClient.csproj" />
+        <ProjectReference Include="..\ServiceProfiler.EventPipe.Client\ServiceProfiler.EventPipe.Client.csproj" />
+    </ItemGroup>
+</Project>

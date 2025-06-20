@@ -26,6 +26,7 @@ using Microsoft.ServiceProfiler.DataContract.Settings;
 using Microsoft.ServiceProfiler.Orchestration;
 using Microsoft.ServiceProfiler.Orchestration.MetricsProviders;
 using Microsoft.ServiceProfiler.Utilities;
+using ServiceProfiler.Common.Utilities;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 
@@ -36,7 +37,8 @@ internal static class ServiceCollectionExtensions
     public static IServiceCollection AddServiceProfilerCore(this IServiceCollection services)
     {
         // Utilities
-        services.AddSingleton<IConnectionStringParserFactory, ConnectionStringParserFactory>();
+        services.AddConnectionString();
+        services.AddSingleton<ITraceFileFormatDefinition, CurrentTraceFileFormat>();
 
         // Role name detectors and sources
         services.AddSingleton<OtelResourceDetector>();
@@ -73,7 +75,7 @@ internal static class ServiceCollectionExtensions
         services.AddSingleton<INamedPipeClientFactory, NamedPipeClientFactory>();
 
         // Profiler Context
-        services.AddSingleton<IEndpointProvider, EndpointProvider>();
+        services.AddSingleton<IEndpointProvider, ProfilerEndpointProvider>();
         services.AddTransient<IMetadataWriter, MetadataWriter>();
 
         // Transient trace session listeners
@@ -162,6 +164,20 @@ internal static class ServiceCollectionExtensions
 
         // Scavengers
         AddTraceScavengerServices(services);
+
+        return services;
+    }
+
+    private static IServiceCollection AddConnectionString(this IServiceCollection services)
+    {
+        services.AddSingleton(p =>
+        {
+            ServiceProfilerOptions serviceProfilerOptions = p.GetRequiredService<IOptions<ServiceProfilerOptions>>().Value ?? throw new InvalidOperationException("ServiceProfilerOptions is required to be set.");
+            string connectionStringValue = serviceProfilerOptions.ConnectionString ?? throw new InvalidOperationException("Connection string is required. Please make sure its properly set.");
+            return ConnectionString.TryParse(connectionStringValue, out ConnectionString? connectionString)
+                ? connectionString
+                : throw new InvalidOperationException($"Invalid connection string: {connectionStringValue}");
+        });
 
         return services;
     }

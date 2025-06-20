@@ -1,0 +1,86 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Uploader",
+      "command": "dotnet",
+      "type": "shell",
+      "args": [
+        "build",
+        "-c",
+        "${input:configuration}",
+        // Ask dotnet build to generate full paths for file names.
+        "/property:GenerateFullPaths=true",
+        // Do not generate summary otherwise it leads to duplicate errors in Problems panel
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Publish Uploader",
+      "command": "dotnet",
+      "args": [
+        "publish",
+        "-c",
+        "${input:configuration}",
+        "--no-build"
+      ],
+      "dependsOn":[
+        "Build Uploader"
+      ],
+      "type": "shell",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Build, Publish, Pack Uploaders",
+      "command": "./PackUploader.cmd",
+      "dependsOn": [
+        "Publish Uploader"
+      ],
+      "args": [
+        "${input:configuration}",
+        "FALSE"
+      ],
+      "type": "shell",
+      "group": "build",
+      "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/../tools/"
+      },
+      "problemMatcher": "$msCompile",
+    }
+  ],
+  "inputs": [
+    {
+      "id": "configuration",
+      "description": "What configuration to use for build?",
+      "default": "Debug",
+      "options": [
+        "Debug",
+        "Release"
+      ],
+      "type": "pickString"
+    }
+  ]
+}
