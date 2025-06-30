@@ -11,8 +11,12 @@ parameters:
     displayName: Type of Build
     type: string
     default: PR
-  - name: OverwriteVersion
-    displayName: Overwrite Version
+  - name: OTelProfilerNuGetVersion
+    displayName: Overwrite Version for OTel Profiler NuGet Package
+    type: string
+    default: ""
+  - name: AppInsightsProfilerNuGetVersion
+    displayName: Overwrite Version for App Insights Profiler NuGet Package
     type: string
     default: ""
 
@@ -47,7 +51,7 @@ jobs:
         displayName: Restore solution
         inputs:
           command: "restore"
-          projects: $(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln
+          projects: $(Build.SourcesDirectory)/src/EventPipe.Profilers.All.sln
           selectOrConfig: config
           nugetConfigPath: NuGet.Config
 
@@ -55,7 +59,7 @@ jobs:
         displayName: Build solution
         inputs:
           command: "build"
-          projects: "$(Build.SourcesDirectory)/src/Azure.Monitor.OpenTelemetry.Profiler.sln"
+          projects: "$(Build.SourcesDirectory)/src/EventPipe.Profilers.All.sln"
           arguments: "/p:Configuration=$(BuildConfiguration) /p:IsSpOfficialBuild=true"
 
       - task: DotNetCoreCLI@2
@@ -90,8 +94,9 @@ jobs:
             !**/obj/**;
           search_root: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Upload"
 
+      # Pack the uploader for Azure Monitor OpenTelemetry Profiler
       - task: ArchiveFiles@2
-        displayName: Zip uploader
+        displayName: Setup Uploader for Azure Monitor OpenTelemetry Profiler
         inputs:
           rootFolderOrFile: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Upload/bin/$(BuildConfiguration)/net8.0/publish/"
           includeRootFolder: false
@@ -99,10 +104,19 @@ jobs:
           archiveFile: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler/obj/$(BuildConfiguration)/Uploader/Uploader.zip"
           replaceExistingArchive: true
           verbose: true
+      
+      # Pack the uploader for App Insights Profiler
+      - task: CopyFiles@2
+        displayName: Setup Uploader for App Insights Profiler
+        inputs:
+          SourceFolder: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler/obj/$(BuildConfiguration)/Uploader"
+          Contents: |
+            Uploader.zip
+          TargetFolder: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.AspNetCore/obj/$(BuildConfiguration)/Uploader/"
 
-      # Signing binaries
+      # Signing binaries for Otel profiler
       - task: onebranch.pipeline.signing@1
-        displayName: Sign MS Binaries
+        displayName: Sign MS Binaries for OTel Profiler
         inputs:
           command: "sign"
           signing_profile: "external_distribution"
@@ -112,17 +126,53 @@ jobs:
             !src/ServiceProfiler.EventPipe.Upload/**;
           search_root: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel"
 
+      # Signing binaries for Otel profiler
+      - task: onebranch.pipeline.signing@1
+        displayName: Sign MS Binaries for App Insights Profiler
+        inputs:
+          command: "sign"
+          signing_profile: "external_distribution"
+          files_to_sign: |
+            **/*.exe;
+            **/*.dll;
+            !src/ServiceProfiler.EventPipe.Upload/**;
+          search_root: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe"
+
       - task: DotNetCoreCLI@2
-        displayName: "Create the NuGet package"
+        displayName: "Create the NuGet package for Otel Profiler"
         inputs:
           command: "pack"
           nobuild: true
-          packagesToPack: $(Build.SourcesDirectory)\src\ServiceProfiler.EventPipe.Otel\Azure.Monitor.OpenTelemetry.Profiler\Azure.Monitor.OpenTelemetry.Profiler.csproj
+          packagesToPack: $(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel/Azure.Monitor.OpenTelemetry.Profiler/Azure.Monitor.OpenTelemetry.Profiler.csproj
           packDirectory: "$(Build.SourcesDirectory)/packages"
-          ${{ if eq(parameters.OverwriteVersion, '') }}:
+          ${{ if eq(parameters.OTelProfilerNuGetVersion, '') }}:
             buildProperties: "VersionSuffix=${{ lower(parameters.BuildType) }}-$(Build.BuildNumber);SymbolPackageFormat=symbols.nupkg"
           ${{ else }}:
-            buildProperties: "Version=${{ parameters.OverwriteVersion }};SymbolPackageFormat=symbols.nupkg"
+            buildProperties: "Version=${{ parameters.OTelProfilerNuGetVersion }};SymbolPackageFormat=symbols.nupkg"
+
+      - task: DotNetCoreCLI@2
+        displayName: "Create the NuGet package for App Insights Profiler - Core"
+        inputs:
+          command: "pack"
+          nobuild: true
+          packagesToPack: $(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.Client/ServiceProfiler.EventPipe.Client.csproj
+          packDirectory: "$(Build.SourcesDirectory)/packages"
+          ${{ if eq(parameters.AppInsightsProfilerNuGetVersion, '') }}:
+            buildProperties: "VersionSuffix=${{ lower(parameters.BuildType) }}-$(Build.BuildNumber);SymbolPackageFormat=symbols.nupkg"
+          ${{ else }}:
+            buildProperties: "Version=${{ parameters.AppInsightsProfilerNuGetVersion }};SymbolPackageFormat=symbols.nupkg"
+
+      - task: DotNetCoreCLI@2
+        displayName: "Create the NuGet package for App Insights Profiler - ASP.NET Core"
+        inputs:
+          command: "pack"
+          nobuild: true
+          packagesToPack: $(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe/ServiceProfiler.EventPipe.AspNetCore/ServiceProfiler.EventPipe.AspNetCore.csproj
+          packDirectory: "$(Build.SourcesDirectory)/packages"
+          ${{ if eq(parameters.AppInsightsProfilerNuGetVersion, '') }}:
+            buildProperties: "VersionSuffix=${{ lower(parameters.BuildType) }}-$(Build.BuildNumber);SymbolPackageFormat=symbols.nupkg"
+          ${{ else }}:
+            buildProperties: "Version=${{ parameters.AppInsightsProfilerNuGetVersion }};SymbolPackageFormat=symbols.nupkg"
 
       # Sign NuGet packages
       - task: onebranch.pipeline.signing@1
@@ -133,9 +183,9 @@ jobs:
           files_to_sign: '**\*.nupkg'
           search_root: "$(Build.SourcesDirectory)/packages"
 
-      # Output artifacts
+      # Output artifacts - Otel Profiler
       - task: CopyFiles@2
-        displayName: Copy Binaries - Service Profiler for Linux
+        displayName: Copy Binaries - Otel Profiler
         inputs:
           SourceFolder: $(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel
           Contents: |
@@ -144,7 +194,30 @@ jobs:
             # !!ServiceProfiler.EventPipe.Upload/**/publish/**
             # !ServiceProfiler.EventPipe.NuGetSigning/bin/**
             !**/obj/**
-          TargetFolder: '$(Build.ArtifactStagingDirectory)\bin\ServiceProfilerForLinux'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/bin'
+
+      # Output artifacts - App Insights Profiler
+      - task: CopyFiles@2
+        displayName: Copy Binaries - App Insights Profiler
+        inputs:
+          SourceFolder: $(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe
+          Contents: |
+            **/bin/**
+            # !ServiceProfiler.EventPipe.Upload/**
+            # !!ServiceProfiler.EventPipe.Upload/**/publish/**
+            # !ServiceProfiler.EventPipe.NuGetSigning/bin/**
+            !**/obj/**
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/bin'
+
+      # Output artifacts - App Uploader
+      - task: CopyFiles@2
+        displayName: Copy Binaries - Uploader
+        inputs:
+          SourceFolder: $(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Upload
+          Contents: |
+            **/bin/**
+            !**/obj/**
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/bin'
 
       # Output NuGet packages
       - task: CopyFiles@2
@@ -153,7 +226,7 @@ jobs:
           SourceFolder: $(Build.SourcesDirectory)/packages
           Contents: |
             **\*.*nupkg
-          TargetFolder: $(Build.ArtifactStagingDirectory)\packages
+          TargetFolder: $(Build.ArtifactStagingDirectory)/packages
           flattenFolders: true
 
       # Publish Artifacts
