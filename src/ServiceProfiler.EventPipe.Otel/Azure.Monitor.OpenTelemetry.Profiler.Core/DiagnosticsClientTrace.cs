@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------------
 
 using System.Diagnostics;
+using Microsoft.ApplicationInsights.Profiler.Shared.Services.Abstractions;
 using Microsoft.Diagnostics.NETCore.Client;
 using Microsoft.Extensions.Logging;
 

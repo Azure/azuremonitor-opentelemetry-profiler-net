@@ -20,6 +20,7 @@
         <dependency id="Azure.Identity" version="$AzureIdentityVersion$" exclude="Build,Analyzers" />
         <dependency id="Azure.Monitor.OpenTelemetry.Exporter" version="$AzureMonitorOpenTelemetryExporterVersion$" exclude="Build,Analyzers" />
         <dependency id="CommandLineParser" version="$CommandLineParserVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Bcl.AsyncInterfaces" version="$MicrosoftBclAsyncInterfacesVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Diagnostics.NETCore.Client" version="$MicrosoftDiagnosticsNETCoreClientVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Configuration" version="$MicrosoftExtensionsConfigurationVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Hosting.Abstractions" version="$MicrosoftExtensionsHostingAbstractionsVersion$" exclude="Build,Analyzers" />
@@ -42,7 +43,7 @@
     <file src="bin\$configuration$\$targetFramework$\*.pdb" target="lib/$targetFramework$"></file>
 
     <!-- Uploader -->
-    <file src="obj\$configuration$\Uploader\Uploader.zip" target="contentFiles\any\net6.0\ServiceProfiler\TraceUpload.zip"></file>
+    <file src="obj\$configuration$\Uploader\Uploader.zip" target="contentFiles\any\net8.0\ServiceProfiler\TraceUpload.zip"></file>
 
     <!-- Readme -->
     <file src="..\Readme.md" target="docs\" />

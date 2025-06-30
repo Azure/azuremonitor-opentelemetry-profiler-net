@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>Microsoft.ApplicationInsights.Profiler.Uploader</AssemblyName>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageId>Microsoft.ServiceProfiler.EventPipe.Uploader</PackageId>
+    <UseAppHost>false</UseAppHost>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>NU1608</NoWarn>
+    <RollForward>LatestMajor</RollForward>
+    <EnablePublicAPIAnalyzers>false</EnablePublicAPIAnalyzers>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="ServiceProfiler.EventPipe.Upload.Tests" Key="$(TestPublicKey)" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" Key="$(TestPublicKey)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" />
+    <PackageReference Include="System.Memory.Data" />
+    <!--
+            Without explicit reference to System.Text.Json we are relying on dependency versions brought in by the CLR.
+            This can introduce mismatched assembly errors depending on which version of .net the users project is relying on.
+            For more information review the bug report found here: https://github.com/microsoft/ApplicationInsights-Profiler-AspNetCore/issues/169
+        -->
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="Microsoft.ApplicationInsights" />
+    <PackageReference Include="Microsoft.Diagnostics.NETCore.Client" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.ServiceProfiler.Agent.Ingestion\Microsoft.ServiceProfiler.Agent.Ingestion.csproj" />
+    <ProjectReference Include="..\ServiceProfiler.Agent.Profiler.FrontendClient.Profiler\Microsoft.ServiceProfiler.Agent.FrontendClient.Profiler.csproj" />
+    <ProjectReference Include="..\ServiceProfiler.EventPipe\ServiceProfiler.EventPipe.Logging\ServiceProfiler.EventPipe.Logging.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Contracts\SampleActivity.cs" Link="SampleActivity.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services\EnumerableUtilities.cs" Link="EnumerableUtilities.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services\HighPerfJsonStringConverter.cs" Link="HighPerfJsonStringConverter.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services\HighPerfJsonSerializationProvider.cs" Link="HighPerfJsonSerializationProvider.cs" />
+
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services\ActivityIdUtilities.cs" Link="ActivityIdUtilities.cs" />
+
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services.Abstractions\IPC\INamedPipeOperations.cs" Link="IPC\INamedPipeOperations.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Contracts\NamedPipeOptions.cs" Link="IPC\NamedPipeOptions.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services.Abstractions\IPC\INamedPipeClientService.cs" Link="IPC\INamedPipeClientService.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services.Abstractions\IPC\INamedPipeServerFactory.cs" Link="IPC\INamedPipeServerFactory.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services.Abstractions\IPC\INamedPipeServerService.cs" Link="IPC\INamedPipeServerService.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services.Abstractions\IPC\INamedPipeClientFactory.cs" Link="IPC\INamedPipeClientFactory.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services\IPC\*.cs" Link="IPC\*.cs" />
+
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services.Abstractions\IPC\IPayloadSerializer.cs" Link="IPC\IPayloadSerializer.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Contracts\IPCAdditionalData.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Contracts\UploadMode.cs"/>
+
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services.Abstractions\ISerializationProvider.cs" Link="Services.Abstractions\ISerializationProvider.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Services.Abstractions\ISerializationOptionsProvider.cs" Link="Services.Abstractions\ISerializationOptionsProvider.cs" />
+
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Contracts\UserConfigurationBase.cs" Link="Contracts\UserConfigurationBase.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Contracts\EventPipeProviderItem.cs" Link="Contracts\EventPipeProviderItem.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Contracts\TraceScavengerOptions.cs" Link="Contracts\TraceScavengerOptions.cs" />
+    <Compile Include="..\Microsoft.ApplicationInsights.Profiler.Shared\Contracts\CustomEvents\*.cs" />
+
+    <Compile Include="..\ServiceProfiler.EventPipe\ServiceProfiler.EventPipe.Client\Utilities\TelemetryConfigurationBuilder.cs" Link="TelemetryConfigurationBuilder.cs" />
+    <Compile Include="..\ServiceProfiler.EventPipe\ServiceProfiler.EventPipe.Client\Utilities\PreventSamplingTelemetryInitializer.cs" Link="PreventSamplingTelemetryInitializer.cs" />
+  </ItemGroup>
+
+  <Target Name="PostPublishExtension" AfterTargets="Publish">
+    <!--Pack up the whole uploader into zip-->
+    <Exec Command="$(MSBuildProjectDirectory)\..\ServiceProfiler.EventPipe\tools\PackUploader.cmd $(Configuration) FALSE" Condition=" '$(BuildingInsideVisualStudio)' != 'true' and '$(IsSpOfficialBuild)' == 'true' " />
+  </Target>
+</Project>

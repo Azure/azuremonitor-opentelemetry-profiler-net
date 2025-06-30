@@ -1,0 +1,38 @@
+Major refactor notes:
+
+1. Stopped reference from `ServiceProfiler.EventPipe.Orchestration` to `ServiceProfiler.EventPipe.Client`.
+   It should be the otherway around since the beginning.
+
+2. Change ResourceUsageSource implemenation.
+  The chnage has been make to OTel Profiler. See https://microsoft.sharepoint.com/teams/DevDivDiagnosticServices/_layouts/Doc.aspx?sourcedoc={00EEA8E9-28E5-490D-A515-081C61F7710A}&wd=target%28EventPipe%20Profiler.one%7C29C7BE14-7573-4D48-80CC-258217574C4A%2FSimplified%20Metrics%20Providers%7C42A3308E-B87D-4ACD-9148-8E6DA1F227A0%2F%29&wdpartid={4F6F7FAE-EE4B-0256-3780-04AF0C3BC15D}{1}&wdsectionfileid={A55539E6-4ABD-44BE-B9D7-3587731F2723} for design details.
+  [ ] Switch to use the new implemenation
+  [ ] Wire up the service registration
+  [ ] Tests
+
+3. Correct expiration policy
+  The expiration policy has been corrected to concreate types than using the interface.
+  For example, stop using `IExpirationPolicy`, instead use `ProcessExpirationPolicy` or even policy factory to create very specific expiration policies.
+
+    [ ] Wire up the service registration
+        * ProcessExpirationPolicy needs to be regsistered
+        * Factories for expiration policies need to be registered
+    [ ] Tests
+
+4. Redo the service profiler provider to leverage the new PostProfilerProcessor.
+
+5. The IAuthTokenProvider is reimplemented
+    Note: The way to get the credntial object is different because they live in differnet objects between the otel and the app insights sdk implemenation.
+    [ ] Test when AAD auth is enforced.
+
+6. Reuse the new PostProfilerProcessor to handle the post processing of the profiler data.
+    [ ] Making sure the metadata - espcially the file format metadata is correctly set.
+    [ ] Making sure the post processing is done correctly.
+    [ ] Tests
+
+7. "EP_OTEL_PROFILER" be removed.
+    [ ] This was there to workaround new files in share bleeding back to the ServiceProfiler repo. It is now not needed.
+
+8. Use the new implemenation for fetching role name and role instance.
+    [ ] Tests
+
+9. Dependencies for the NuGet packages has been largely changed. Correct the depdencies in the nuspec files.

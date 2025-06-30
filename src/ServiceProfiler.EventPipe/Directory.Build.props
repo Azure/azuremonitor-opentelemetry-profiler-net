@@ -1,0 +1,37 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <SolutionDir Condition=" '$(SolutionDir)' == '' ">$(MSBuildThisFileDirectory)..\</SolutionDir>
+    <Nullable>enable</Nullable>
+
+    <!-- Setup Version property. -->
+    <TimeSuffix>$([System.DateTime]::Now.ToString(yyyyMMddHHmm))</TimeSuffix>
+    <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">-private-$(TimeSuffix)</VersionSuffix>
+    <!-- Allows build parameter to overwrite the NuGet package versions -->
+    <DefaultPackageVersion Condition=" $(DefaultPackageVersion) == '' ">3.0.0</DefaultPackageVersion>
+    <!-- Provides default SemVer when the property is set to `default`. That is expected to be the default parameter of the build pipeline. -->
+    <Version Condition=" '$(SPEventPipeNugetVersion)' == 'default' ">$(DefaultPackageVersion)-build-$(TimeSuffix)</Version>
+    <!-- When the value is provided but other than `default`, use it literally. -->
+    <Version Condition=" '$(SPEventPipeNugetVersion)' != '' ">$(SPEventPipeNugetVersion)</Version>
+    <!-- Otherwise, fallback to default version scheme.  -->
+    <Version Condition=" '$(Version)' == '' ">$(DefaultPackageVersion)$(VersionSuffix)</Version>
+
+    <!--Properties for NuGet package-->
+    <!--Refer aka.ms/nuget for Microsoft NuGet packages authoring compliance-->
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <Authors>Microsoft</Authors>
+    <Owners>microsoft,MicrosoftServiceProfiler</Owners>
+    <PackageProjectUrl>https://go.microsoft.com/fwlink/?linkid=869443</PackageProjectUrl>
+    <PackageLicenseFileName>EULA.md</PackageLicenseFileName>
+    <PackageIconFileName>icon.png</PackageIconFileName>
+    <RequireLicenseAcceptance>true</RequireLicenseAcceptance>
+    <PackageReleaseNotes>https://go.microsoft.com/fwlink/?linkid=869445</PackageReleaseNotes>
+    <NuspecProperties>
+      authors=$(Authors); owners=$(Owners); projectUrl=$(PackageProjectUrl); licenseFileName=$(PackageLicenseFileName); iconFileName=$(PackageIconFileName); requireLicenseAcceptance=$(RequireLicenseAcceptance); releaseNotes=$(PackageReleaseNotes); copyright=$(Copyright);
+      $(NuspecProperties)
+    </NuspecProperties>
+
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)\Profiler.EventPipe.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>$(NoWarn);NU1608;</NoWarn>
+  </PropertyGroup>
+</Project>

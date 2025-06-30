@@ -38,7 +38,7 @@ internal class ServiceProfilerAgentBootstrap : IServiceProfilerAgentBootstrap
 
     public async Task ActivateAsync(CancellationToken cancellationToken)
     {
-        string noIKeyMessage = "No instrumentation key is set. Application Insights Profiler won't start.";
+        string noConnectionStringMessage = "No connection string is set. Application Insights Profiler won't start.";
 
         if (_serializer.TrySerialize(_userConfiguration, out string? serializedUserConfiguration))
         {
@@ -65,9 +65,18 @@ internal class ServiceProfilerAgentBootstrap : IServiceProfilerAgentBootstrap
 
         try
         {
-            if (!_serviceProfilerContext.HasAppInsightsInstrumentationKey)
+            // Connection string exists.
+            if (string.IsNullOrEmpty(_serviceProfilerContext.ConnectionString?.ToString()))
             {
-                _logger.LogError(noIKeyMessage);
+                _logger.LogError(noConnectionStringMessage);
+                return;
+
+            }
+
+            // Instrumentation key is well-formed.
+            if (_serviceProfilerContext.AppInsightsInstrumentationKey == Guid.Empty)
+            {
+                _logger.LogError("Instrumentation key is not set or malformed in the connection string. Application Insights Profiler won't start.");
                 return;
             }
 
@@ -82,7 +91,7 @@ internal class ServiceProfilerAgentBootstrap : IServiceProfilerAgentBootstrap
         catch (ArgumentNullException ex) when (string.Equals(ex.ParamName, "instrumentationKey", StringComparison.OrdinalIgnoreCase))
         {
             Debug.Fail("You hit the safety net! How could it escape the instrumentation key check?");
-            _logger.LogError(noIKeyMessage);
+            _logger.LogError(noConnectionStringMessage);
             return;
         }
         catch (Exception ex)

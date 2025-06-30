@@ -1,0 +1,2 @@
+Microsoft.ApplicationInsights.Profiler.Core.Contracts.UserConfiguration
+Microsoft.ApplicationInsights.Profiler.Core.Contracts.UserConfiguration.UserConfiguration() -> void

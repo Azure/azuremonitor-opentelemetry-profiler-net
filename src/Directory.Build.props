@@ -5,6 +5,6 @@
     <IsEPOtelProfilerBuild Condition=" '$(IsEPOtelProfilerBuild)' == '' ">true</IsEPOtelProfilerBuild>
     <!-- Public API Analyzer's enabled for EventPipe OTel Profiler build unless overwritten. -->
     <EnablePublicAPIAnalyzers>true</EnablePublicAPIAnalyzers>
-    <DefineConstants>$(DefineConstants);STRICT_INTERNAL;EP_OTEL_PROFILER</DefineConstants>
+    <DefineConstants>$(DefineConstants);STRICT_INTERNAL</DefineConstants>
   </PropertyGroup>
 </Project>

@@ -1,0 +1,110 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "group": "build",
+      "label": "Build the Solution",
+      "command": "dotnet",
+      "type": "process",
+      "dependsOn": [
+        "Restore NuGet packages for the Solution"
+      ],
+      "args": [
+        "build",
+        "ServiceProfilerEventPipe.sln",
+        "-c",
+        "${input:configuration}",
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "group": "build",
+      "label": "Build ServiceProfiler.Contract",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/../ServiceProfiler.Contract/Microsoft.ServiceProfiler.Contract.csproj"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "group": "build",
+      "label": "Build & Pack Private NuGet Packages",
+      "command": "${workspaceFolder}/tools/PackNugetPackage.cmd",
+      "type": "shell",
+      "args": [
+        "${input:configuration}",
+        "private",
+        "TRUE"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "group": "test",
+      "label": "Run All Unit Tests",
+      "command": "${workspaceFolder}/tools/RunUnitTests.cmd",
+      "type": "process",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "group": "build",
+      "label": "Restore NuGet packages for the Solution",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "restore",
+        "ServiceProfilerEventPipe.sln"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "group": "none",
+      "label": "Clean the repository (dry-run)",
+      "type": "shell",
+      "command": "git",
+      "args": [
+        "clean",
+        "-nfdx"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "problemMatcher": []
+    },
+    {
+      "group": "none",
+      "label": "Clean the repository (run)",
+      "type": "shell",
+      "command": "git",
+      "args": [
+        "clean",
+        "-fdx"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "configuration",
+      "description": "What configuration to use for build?",
+      "default": "Debug",
+      "options": [
+        "Debug",
+        "Release"
+      ],
+      "type": "pickString"
+    }
+  ]
+}

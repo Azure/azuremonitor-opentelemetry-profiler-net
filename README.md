@@ -101,6 +101,11 @@ Assuming you are building an **ASP.NET Core application**.
 
     ![sample trace](./images/sample-trace.png)
 
+## Next
+
+- [Setup the Role name](./docs/SetupCloudRoleName.md)
+- [Read the examples](#examples)
+
 ## Examples
 
 Learn more by following the examples:

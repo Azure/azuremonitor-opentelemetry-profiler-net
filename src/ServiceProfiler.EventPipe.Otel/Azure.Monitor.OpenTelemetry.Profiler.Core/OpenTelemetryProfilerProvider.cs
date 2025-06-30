@@ -15,8 +15,6 @@ internal sealed class OpenTelemetryProfilerProvider : IServiceProfilerProvider, 
     internal const string TraceFileExtension = ".nettrace";
     private string? _currentTraceFilePath;
     private readonly SemaphoreSlim _singleProfilingSemaphore = new(1, 1);
-    private bool IsSemaphoreTaken => _singleProfilingSemaphore.CurrentCount == 0;
-
     private readonly ITraceControl _traceControl;
     private readonly IUserCacheManager _userCacheManager;
     private readonly TraceSessionListenerFactory _traceSessionListenerFactory;
@@ -31,6 +29,8 @@ internal sealed class OpenTelemetryProfilerProvider : IServiceProfilerProvider, 
 
     private TraceSessionListener? _listener;
 
+    /// <inheritdoc />
+    public bool IsProfilerRunning => _singleProfilingSemaphore.CurrentCount == 0;
     public string Source => nameof(OpenTelemetryProfilerProvider);
 
     public OpenTelemetryProfilerProvider(
@@ -49,6 +49,7 @@ internal sealed class OpenTelemetryProfilerProvider : IServiceProfilerProvider, 
         _traceControl = traceControl ?? throw new ArgumentNullException(nameof(traceControl));
     }
 
+    /// <inheritdoc />
     public async Task<bool> StartServiceProfilerAsync(IProfilerSource source, CancellationToken cancellationToken = default)
     {
         _logger.LogTrace("Entering {name}.", nameof(StartServiceProfilerAsync));
@@ -105,6 +106,7 @@ internal sealed class OpenTelemetryProfilerProvider : IServiceProfilerProvider, 
         return profilerStarted;
     }
 
+    /// <inheritdoc />
     public async Task<bool> StopServiceProfilerAsync(IProfilerSource source, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(StopProfilerTriggered);
@@ -117,7 +119,7 @@ internal sealed class OpenTelemetryProfilerProvider : IServiceProfilerProvider, 
             throw new ArgumentNullException(nameof(source));
         }
 
-        if (!IsSemaphoreTaken)
+        if (!IsProfilerRunning)
         {
             _logger.LogDebug("Try to stop profiler while none is is running.");
             return false;
@@ -188,9 +190,9 @@ internal sealed class OpenTelemetryProfilerProvider : IServiceProfilerProvider, 
 
     private void ReleaseSemaphoreForProfiling()
     {
-        if (IsSemaphoreTaken)
+        if (IsProfilerRunning)
         {
             _singleProfilingSemaphore.Release();
-        };
+        }
     }
 }

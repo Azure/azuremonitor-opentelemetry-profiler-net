@@ -1,0 +1,8 @@
+#nullable enable
+Microsoft.AspNetCore.Hosting.ServiceProfilerInjection
+Microsoft.AspNetCore.Hosting.ServiceProfilerInjection.Configure(Microsoft.AspNetCore.Hosting.IWebHostBuilder! builder) -> void
+Microsoft.AspNetCore.Hosting.ServiceProfilerInjection.ServiceProfilerInjection() -> void
+Microsoft.Extensions.DependencyInjection.ServiceProfilerExtensions
+static Microsoft.Extensions.DependencyInjection.ServiceProfilerExtensions.AddServiceProfiler(this Microsoft.Extensions.DependencyInjection.IServiceCollection! serviceCollection) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Microsoft.Extensions.DependencyInjection.ServiceProfilerExtensions.AddServiceProfiler(this Microsoft.Extensions.DependencyInjection.IServiceCollection! serviceCollection, Microsoft.Extensions.Configuration.IConfiguration! configuration) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Microsoft.Extensions.DependencyInjection.ServiceProfilerExtensions.AddServiceProfiler(this Microsoft.Extensions.DependencyInjection.IServiceCollection! serviceCollection, System.Action<Microsoft.ApplicationInsights.Profiler.Core.Contracts.UserConfiguration!>? options) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
