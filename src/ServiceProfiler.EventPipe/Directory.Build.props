@@ -6,7 +6,7 @@
 
     <!-- Setup Version property. -->
     <TimeSuffix>$([System.DateTime]::Now.ToString(yyyyMMddHHmm))</TimeSuffix>
-    <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">-private-$(TimeSuffix)</VersionSuffix>
+    <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">private-$(TimeSuffix)</VersionSuffix>
     <!-- Allows build parameter to overwrite the NuGet package versions -->
     <DefaultPackageVersion Condition=" $(DefaultPackageVersion) == '' ">3.0.0</DefaultPackageVersion>
     <!-- Provides default SemVer when the property is set to `default`. That is expected to be the default parameter of the build pipeline. -->
@@ -14,7 +14,7 @@
     <!-- When the value is provided but other than `default`, use it literally. -->
     <Version Condition=" '$(SPEventPipeNugetVersion)' != '' ">$(SPEventPipeNugetVersion)</Version>
     <!-- Otherwise, fallback to default version scheme.  -->
-    <Version Condition=" '$(Version)' == '' ">$(DefaultPackageVersion)$(VersionSuffix)</Version>
+    <Version Condition=" '$(Version)' == '' ">$(DefaultPackageVersion)-$(VersionSuffix)</Version>
 
     <!--Properties for NuGet package-->
     <!--Refer aka.ms/nuget for Microsoft NuGet packages authoring compliance-->
