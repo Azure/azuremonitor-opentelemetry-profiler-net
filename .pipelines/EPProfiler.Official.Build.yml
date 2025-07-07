@@ -80,13 +80,5 @@ extends:
           PublishNuGetPackages: ${{ parameters.PublishNuGetPackages }}
           PublishSymbols: ${{ parameters.PublishSymbols }}
           BuildType: Official
-          OTelProfilerNuGetVersion: ${{ if eq(parameters.OTelProfilerNuGetVersion, 'default') }}
-                                      ${{ '' }}
-                                    ${{ else }}
-                                      ${{ parameters.OTelProfilerNuGetVersion }}
-                                    ${{ endif }}
-          AppInsightsProfilerNuGetVersion: ${{ if eq(parameters.AppInsightsProfilerNuGetVersion, 'default') }}
-                                            ${{ '' }}
-                                          ${{ else }}
-                                            ${{ parameters.AppInsightsProfilerNuGetVersion }}
-                                          ${{ endif }}
+          OTelProfilerNuGetVersion: ${{ parameters.OTelProfilerNuGetVersion == 'default' && '' || parameters.OTelProfilerNuGetVersion }}
+          AppInsightsProfilerNuGetVersion: ${{ parameters.AppInsightsProfilerNuGetVersion == 'default' && '' || parameters.AppInsightsProfilerNuGetVersion }}
