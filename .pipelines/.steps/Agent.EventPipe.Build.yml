@@ -126,7 +126,7 @@ jobs:
             !src/ServiceProfiler.EventPipe.Upload/**;
           search_root: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel"
 
-      # Signing binaries for Otel profiler
+      # Signing binaries for App Insights profiler
       - task: onebranch.pipeline.signing@1
         displayName: Sign MS Binaries for App Insights Profiler
         inputs:
@@ -194,7 +194,7 @@ jobs:
             # !!ServiceProfiler.EventPipe.Upload/**/publish/**
             # !ServiceProfiler.EventPipe.NuGetSigning/bin/**
             !**/obj/**
-          TargetFolder: '$(Build.ArtifactStagingDirectory)/bin'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/bin/ServiceProfiler.EventPipe.Otel'
 
       # Output artifacts - App Insights Profiler
       - task: CopyFiles@2
@@ -207,7 +207,7 @@ jobs:
             # !!ServiceProfiler.EventPipe.Upload/**/publish/**
             # !ServiceProfiler.EventPipe.NuGetSigning/bin/**
             !**/obj/**
-          TargetFolder: '$(Build.ArtifactStagingDirectory)/bin'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/bin/ServiceProfiler.EventPipe'
 
       # Output artifacts - App Uploader
       - task: CopyFiles@2
@@ -215,9 +215,9 @@ jobs:
         inputs:
           SourceFolder: $(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Upload
           Contents: |
-            **/bin/**
+            **/publish/**
             !**/obj/**
-          TargetFolder: '$(Build.ArtifactStagingDirectory)/bin'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/bin/ServiceProfiler.EventPipe.Upload'
 
       # Output NuGet packages
       - task: CopyFiles@2
