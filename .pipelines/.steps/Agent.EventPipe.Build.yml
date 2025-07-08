@@ -60,7 +60,7 @@ jobs:
         inputs:
           command: "build"
           projects: "$(Build.SourcesDirectory)/src/EventPipe.Profilers.All.sln"
-          arguments: "/p:Configuration=$(BuildConfiguration) /p:IsSpOfficialBuild=true"
+          arguments: "/p:Configuration=$(BuildConfiguration) /p:IsSpOfficialBuild=true /p:GeneratePackageOnBuild=false"
 
       - task: DotNetCoreCLI@2
         displayName: Publish Uploader
@@ -123,7 +123,7 @@ jobs:
           files_to_sign: |
             **/*.exe;
             **/*.dll;
-            !src/ServiceProfiler.EventPipe.Upload/**;
+            !**/obj/**;
           search_root: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe.Otel"
 
       # Signing binaries for App Insights profiler
@@ -135,7 +135,8 @@ jobs:
           files_to_sign: |
             **/*.exe;
             **/*.dll;
-            !src/ServiceProfiler.EventPipe.Upload/**;
+            !**/obj/**;
+            !tools/**;
           search_root: "$(Build.SourcesDirectory)/src/ServiceProfiler.EventPipe"
 
       - task: DotNetCoreCLI@2

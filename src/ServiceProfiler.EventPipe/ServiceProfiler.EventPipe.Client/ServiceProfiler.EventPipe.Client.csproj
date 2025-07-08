@@ -15,12 +15,6 @@
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" Key="$(TestPublicKey)" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(IsSpOfficialBuild)' == 'true' ">
-    <!--Only generate NuGet packages on server build-->
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <IncludeSymbols>false</IncludeSymbols>
-  </PropertyGroup>
-
   <!--NuGet package properties-->
   <PropertyGroup>
     <NuspecFile>ServiceProfiler.EventPipe.Core.nuspec</NuspecFile>
