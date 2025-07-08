@@ -34,8 +34,8 @@ variables:
   BuildConfiguration: Release
   BuildPlatform: Any CPU
   WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2019/vse2022:latest' 
-  OTelVersionValue: ${{ parameters.OTelProfilerNuGetVersion }}
-  AppInsightsVersionValue: ${{ parameters.AppInsightsProfilerNuGetVersion }}
+  OTelVersionValue: ${{ iif( eq(parameters.OTelProfilerNuGetVersion, 'default'), '', parameters.OTelProfilerNuGetVersion) }}
+  AppInsightsVersionValue: ${{ iif( eq(parameters.AppInsightsProfilerNuGetVersion, 'default'), '', parameters.AppInsightsProfilerNuGetVersion) }}
 
 resources:
   repositories:
@@ -82,5 +82,5 @@ extends:
           PublishNuGetPackages: ${{ parameters.PublishNuGetPackages }}
           PublishSymbols: ${{ parameters.PublishSymbols }}
           BuildType: Official
-          OTelProfilerNuGetVersion: $[ eq(parameters.OTelProfilerNuGetVersion, 'default') ? '' : parameters.OTelProfilerNuGetVersion ]
-          AppInsightsProfilerNuGetVersion: $[ eq(parameters.AppInsightsProfilerNuGetVersion, 'default') ? '' : parameters.AppInsightsProfilerNuGetVersion ]
+          OTelProfilerNuGetVersion: ${{ variables.OTelVersionValue}}
+          AppInsightsProfilerNuGetVersion: ${{ variables.AppInsightsVersionValue }}
