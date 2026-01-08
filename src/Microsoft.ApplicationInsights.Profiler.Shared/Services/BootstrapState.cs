@@ -5,7 +5,8 @@ namespace Microsoft.ApplicationInsights.Profiler.Shared.Services;
 
 internal sealed class BootstrapState : IDisposable
 {
-    private bool _isDisposed = false;
+    // To use Interlocked with bool, we use int where 0 = false, 1 = true
+    private int _isDisposed = 0;
 
     private readonly ManualResetEventSlim _eventWaitHandle = new(initialState: false);
     private volatile bool _isProfilerRunning;
@@ -15,6 +16,11 @@ internal sealed class BootstrapState : IDisposable
     /// </summary>
     public void SetProfilerRunning(bool isRunning)
     {
+        if (Interlocked.CompareExchange(ref _isDisposed, 0, 0) == 1)
+        {
+            throw new ObjectDisposedException(nameof(BootstrapState));
+        }
+
         _isProfilerRunning = isRunning;
         _eventWaitHandle.Set();
     }
@@ -26,28 +32,23 @@ internal sealed class BootstrapState : IDisposable
     /// <returns>>True if profiler is running; false otherwise.</returns>
     public bool IsProfilerRunning(CancellationToken cancellationToken)
     {
+        if (Interlocked.CompareExchange(ref _isDisposed, 0, 0) == 1)
+        {
+            throw new ObjectDisposedException(nameof(BootstrapState));
+        }
+
         _eventWaitHandle.Wait(cancellationToken);
         return _isProfilerRunning;
     }
 
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (_isDisposed)
+        if (Interlocked.Exchange(ref _isDisposed, 1) == 1)
         {
             return;
         }
 
-        if (disposing)
-        {
-            _eventWaitHandle.Dispose();
-        }
-
-        _isDisposed = true;
+        _eventWaitHandle.Set(); // Unblock any waiters first
+        _eventWaitHandle.Dispose();
     }
 }

@@ -9,7 +9,7 @@
   <PropertyGroup Condition=" '$(StrongNameSignAssembly)' == 'true' ">
     <SignAssembly>$(StrongNameSignAssembly)</SignAssembly>
     <!-- All unit test projects use the test key for strong naming -->
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)/testKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)testKey.snk</AssemblyOriginatorKeyFile>
     <!-- There's no need for full sign of test assemblies. -->
     <DelaySign>true</DelaySign>
   </PropertyGroup>

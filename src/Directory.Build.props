@@ -16,7 +16,7 @@
   <PropertyGroup Condition=" '$(StrongNameSignAssembly)' == 'true' ">
     <!-- Sets whether to strong naming product assemblies -->
     <SignAssembly>$(StrongNameSignAssembly)</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
 
     <!-- At this moment, there's no need for full sign of product assemblies. -->
     <!-- The delay signed assemblies will be fully signed during the official build pipeline by OneBranch. -->
