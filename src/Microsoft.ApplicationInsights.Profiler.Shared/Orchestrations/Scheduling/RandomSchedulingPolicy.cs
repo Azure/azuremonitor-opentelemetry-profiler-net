@@ -56,10 +56,33 @@ internal sealed class RandomSchedulingPolicy : EventPipeSchedulingPolicy
     {
         var result = new List<(TimeSpan duration, ProfilerAction action)>();
 
+        // Clamp overhead to valid range to prevent infinite loop when targetCount > segments.
+        double clampedOverhead = Math.Clamp(_overhead, 0, 1);
+        if (clampedOverhead != _overhead)
+        {
+            Logger.LogWarning("SamplingRate {overhead} is outside the valid range [0, 1]. Clamping to {clampedOverhead}.", _overhead, clampedOverhead);
+        }
+
+        if (ProfilingDuration.TotalSeconds <= 0)
+        {
+            Logger.LogWarning("ProfilingDuration {duration} is not positive. Falling back to standby.", ProfilingDuration);
+            result.Add((PollingInterval, ProfilerAction.Standby));
+            return result.ToAsyncEnumerable();
+        }
+
         // Given this interval these are the number of possible segments for profiling
-        var targetCount = (int)Math.Round(_scheduleInterval.TotalSeconds * _overhead / ProfilingDuration.TotalSeconds);
+        var segments = (int)Math.Round(_scheduleInterval.TotalSeconds / ProfilingDuration.TotalSeconds);
+        if (segments == 0)
+        {
+            throw new InvalidOperationException("No valid segment for random scheduling.");
+        }
+
+        var targetCount = (int)Math.Round(_scheduleInterval.TotalSeconds * clampedOverhead / ProfilingDuration.TotalSeconds);
+        // Safety clamp: targetCount must never exceed segments to prevent an infinite picking loop.
+        targetCount = Math.Min(targetCount, segments);
+
         Logger.LogDebug("Overhead is set to {overhead:p}. {count} profiling sessions expected over the period of {totalRunning}, each session will run for: {duration}. More periods will be scheduled in the future",
-            _overhead, targetCount, _scheduleInterval, ProfilingDuration);
+            clampedOverhead, targetCount, _scheduleInterval, ProfilingDuration);
         // No segments needed. This will happen when overhead is set to 0.
         if (targetCount == 0)
         {
@@ -67,23 +90,10 @@ internal sealed class RandomSchedulingPolicy : EventPipeSchedulingPolicy
             return result.ToAsyncEnumerable();
         }
 
-        // Divide total duration into segments.
-        var segments = (int)Math.Round(_scheduleInterval.TotalSeconds / ProfilingDuration.TotalSeconds);
-        if (segments == 0)
-        {
-            throw new InvalidOperationException("No valid segment for random scheduling.");
-        }
-
-        // Pick random segments according to how many random segments the user wants for this interval
-        var randomPicks = new HashSet<int>();
-        while (randomPicks.Count < targetCount)
-        {
-            var pick = _randomSource.Next() % segments;
-            if (!randomPicks.Contains(pick))
-            {
-                randomPicks.Add(pick);
-            }
-        }
+        // Pick random segments according to how many random segments the user wants for this interval.
+        // When targetCount is more than half of segments, pick segments to EXCLUDE instead (complement approach)
+        // to avoid the coupon collector problem where random rejection sampling becomes very slow.
+        var randomPicks = PickRandomSegments(targetCount, segments, cancellationToken);
 
         // Figure out how long we should stand by between the randomly scheduling profiling events to fill in the interval
         int accumulatedStandbySegments = 0;
@@ -156,4 +166,50 @@ internal sealed class RandomSchedulingPolicy : EventPipeSchedulingPolicy
             list.Add((value, ProfilerAction.Standby));
         }
     }
+
+    /// <summary>
+    /// Picks <paramref name="targetCount"/> distinct random segment indices from [0, <paramref name="segments"/>).
+    /// Uses complement selection when targetCount > segments/2 to avoid the coupon collector problem.
+    /// </summary>
+    private HashSet<int> PickRandomSegments(int targetCount, int segments, CancellationToken cancellationToken)
+    {
+        if (targetCount <= segments / 2)
+        {
+            // Standard rejection sampling — efficient when picking a small fraction.
+            var picks = new HashSet<int>();
+            while (picks.Count < targetCount)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                picks.Add(NextSegmentIndex(segments));
+            }
+            return picks;
+        }
+        else
+        {
+            // Complement approach: pick (segments - targetCount) segments to EXCLUDE,
+            // then return the complement. Much faster when targetCount is close to segments.
+            int excludeCount = segments - targetCount;
+            var excludes = new HashSet<int>();
+            while (excludes.Count < excludeCount)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                excludes.Add(NextSegmentIndex(segments));
+            }
+            var picks = new HashSet<int>();
+            for (int i = 0; i < segments; i++)
+            {
+                if (!excludes.Contains(i))
+                {
+                    picks.Add(i);
+                }
+            }
+            return picks;
+        }
+    }
+
+    /// <summary>
+    /// Returns a uniform random index in [0, <paramref name="segments"/>).
+    /// Uses NextDouble() to avoid modulo bias from Next() % segments.
+    /// </summary>
+    private int NextSegmentIndex(int segments) => (int)(_randomSource.NextDouble() * segments);
 }
