@@ -21,7 +21,7 @@
       <group targetFramework="$targetFramework$">
         <dependency id="Azure.Identity" version="$AzureIdentityVersion$" exclude="Build,Analyzers" />
         <dependency id="CommandLineParser" version="$CommandLineParserVersion$" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.ApplicationInsights.AspNetCore" version="$MicrosoftApplicationInsightsAspNetCoreVersion$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.ApplicationInsights.AspNetCore" version="[$MicrosoftApplicationInsightsAspNetCoreVersion$,3.0.0)" exclude="Build,Analyzers" />
         <dependency id="Microsoft.AspNetCore.Hosting" version="$MicrosoftAspNetCoreHostingVersion$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Bcl.AsyncInterfaces" version="$MicrosoftBclAsyncInterfacesVersion$" exclude="Build,Analyzers"/>
         <dependency id="Microsoft.Diagnostics.NETCore.Client" version="$MicrosoftDiagnosticsNETCoreClientVersion$" exclude="Build,Analyzers" />
