@@ -5,10 +5,10 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <PropertyGroup>
-    <_SystemDiagnosticsDiagnosticSourceVersion>9.0.8</_SystemDiagnosticsDiagnosticSourceVersion>
-    <_SystemIOHashingVersion>9.0.0</_SystemIOHashingVersion>
-    <_SystemMemoryDataVersion>9.0.0</_SystemMemoryDataVersion>
-    <_SystemSecurityCryptographyProtectedDataVersion>9.0.0</_SystemSecurityCryptographyProtectedDataVersion>
+    <_SystemDiagnosticsDiagnosticSourceVersion>10.0.0</_SystemDiagnosticsDiagnosticSourceVersion>
+    <_SystemIOHashingVersion>10.0.0</_SystemIOHashingVersion>
+    <_SystemMemoryDataVersion>10.0.0</_SystemMemoryDataVersion>
+    <_SystemSecurityCryptographyProtectedDataVersion>10.0.0</_SystemSecurityCryptographyProtectedDataVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Update="System.Diagnostics.DiagnosticSource" Version="$(_SystemDiagnosticsDiagnosticSourceVersion)" />

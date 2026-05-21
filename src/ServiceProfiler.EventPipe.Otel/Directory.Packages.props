@@ -10,8 +10,8 @@
     <_AzureMonitorOpenTelemetryExporterVersion>1.4.0</_AzureMonitorOpenTelemetryExporterVersion>
     <_MicrosoftDiagnosticsNETCoreClientVersion>0.2.621003</_MicrosoftDiagnosticsNETCoreClientVersion>
     <_SystemCollectionsImmutableVersion>8.0.0</_SystemCollectionsImmutableVersion>
-    <_SystemMemoryDataVersion>9.0.0</_SystemMemoryDataVersion>
-    <_SystemSecurityCryptographyProtectedDataVersion>9.0.0</_SystemSecurityCryptographyProtectedDataVersion>
+    <_SystemMemoryDataVersion>10.0.0</_SystemMemoryDataVersion>
+    <_SystemSecurityCryptographyProtectedDataVersion>10.0.0</_SystemSecurityCryptographyProtectedDataVersion>
   </PropertyGroup>
 
   <PropertyGroup>
