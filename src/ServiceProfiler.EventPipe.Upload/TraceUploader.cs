@@ -265,7 +265,8 @@ internal class TraceUploader : ITraceUploader
         }
         catch (ValidateFailedException ex)
         {
-            Logger.LogError(ex, "Expected trace validation error.");
+            Logger.LogWarning("Trace validation failed: {message}", ex.Message);
+            Logger.LogDebug(ex, "Trace validation failure details.");
             if (ex.ShouldStopUploading)
             {
                 // Return an empty list of sample activity is the best indicator that the uploading should be skipped without a major refactor.
