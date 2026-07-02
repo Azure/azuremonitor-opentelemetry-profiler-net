@@ -1,25 +1,44 @@
-# Add Azure Monitor Profiler using Copilot (Experiment)
+# Enable the Profiler with optix
+
+The easiest way to enable the Azure Monitor OpenTelemetry Profiler is to let **optix** —
+the [Code Optimizations skills for GitHub Copilot CLI](https://github.com/microsoft/code-optimizations-skills) —
+do it for you. optix ships a dedicated **enable-profiler** setup skill that detects your
+platform and walks you through the changes.
 
 ## Why?
 
 - Fast setup (≈2–3 minutes)
-- Consistent + low risk
-- Surfaces optional profiler features automatically
+- Consistent and low risk — the skill knows the current best practices
+- Works for both the Azure Monitor OpenTelemetry distro and the Application Insights SDK
+
+## Prerequisites
+
+- [GitHub Copilot CLI](https://docs.github.com/en/copilot/github-copilot-in-the-cli) installed and authenticated (`copilot auth login`)
+- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed and logged in (`az login`)
 
 ## Do it
 
-1. Download the prompt file: [enable-profiler.prompt.md](../prompts/enable-profiler.prompt.md). Save a copy into your solution (e.g. ./prompts/, ./eng/, or ./.copilot/) so it is under source control. If browsing in VS Code: open the link, then Save As into your repo.
-2. Open the saved file in VS Code.
-3. Review the prompts/instructions inside so you understand the changes it will generate.
-4. Run the prompt with Copilot.
-5. Commit the generated changes.
+1. Add the optix marketplace and install the skills:
 
-![Screenshots shows that Profiler added by Copilot](./images/enable-profiler-by-copilot.png)
+    ```sh
+    copilot plugin marketplace add microsoft/code-optimizations-skills
+    copilot plugin install optix@microsoft-optix
+    ```
+
+    _Tip: to install only the Setup skills, use `copilot plugin install optix-setup@microsoft-optix`._
+
+2. Ask Copilot to enable the profiler:
+
+    ```sh
+    copilot "Help me enable the Application Insights Profiler"
+    ```
+
+3. Review the changes optix proposes, apply them, and commit.
 
 ## Next
 
-Need more (triggers, schedules, upgrades)? Re‑open the same prompt and ask.
+Once the profiler is running, optix can also help you act on the data — explore errors,
+inspect profiler hot paths, and get code-level optimization recommendations. See the
+[optix skills catalog](https://github.com/microsoft/code-optimizations-skills#readme).
 
-That’s it—run the prompt now and get visibility sooner.
-
-Or [return to Readme](../README.md).
+Or [return to the Readme](../README.md).
