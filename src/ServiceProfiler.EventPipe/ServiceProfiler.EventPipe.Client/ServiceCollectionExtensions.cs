@@ -101,7 +101,7 @@ internal static class ServiceCollectionExtensions
             {
                 logger.LogDebug("Sending anonymous telemetry data to Microsoft to make this product better.");
                 return new EventPipeAppInsightsLogger(
-                    TelemetryConstants.ServiceProfilerAgentIKey);
+                    TelemetryConstants.ServiceProfilerAgentConnectionString);
             }
             else
             {

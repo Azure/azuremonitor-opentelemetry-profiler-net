@@ -58,9 +58,8 @@ internal sealed class TelemetryConfigurationBuilder
         }
 
         _logger.LogDebug(
-            "TelemetryConfiguration created. Connection string: {connectionString}, iKey: {iKey}, Channel Endpoint Address: {channelEndpoint}",
+            "TelemetryConfiguration created. Connection string: {connectionString}, Channel Endpoint Address: {channelEndpoint}",
             telemetryConfiguration.ConnectionString,
-            telemetryConfiguration.InstrumentationKey,
             telemetryConfiguration.TelemetryChannel.EndpointAddress);
 
         return telemetryConfiguration;

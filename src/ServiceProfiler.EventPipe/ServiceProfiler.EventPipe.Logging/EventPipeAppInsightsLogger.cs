@@ -21,12 +21,12 @@ namespace Microsoft.ApplicationInsights.Profiler.Core.Logging
         private bool _isDisposed = false;
 
         /// <summary>
-        /// Creates a logger that sends telemetry using an instrumentation-key-only connection string.
-        /// This routes telemetry to the global ingestion endpoint without AAD authentication and is
-        /// intended only for Microsoft's anonymous-usage telemetry, not customer telemetry.
+        /// Creates a logger that sends telemetry using the given connection string.
+        /// This is intended for Microsoft's anonymous agent-usage telemetry (see
+        /// TelemetryConstants.ServiceProfilerAgentConnectionString), not customer telemetry.
         /// </summary>
-        public EventPipeAppInsightsLogger(Guid instrumentationKey)
-            : this(CreateInstrumentationKeyOnlyConfiguration(instrumentationKey))
+        public EventPipeAppInsightsLogger(string connectionString)
+            : this(CreateConnectionStringConfiguration(connectionString))
         {
         }
 
@@ -45,10 +45,10 @@ namespace Microsoft.ApplicationInsights.Profiler.Core.Logging
             SetCommonProperty(Constants.SdkVersion, sdkVersion);
         }
 
-        private static TelemetryConfiguration CreateInstrumentationKeyOnlyConfiguration(Guid instrumentationKey)
+        private static TelemetryConfiguration CreateConnectionStringConfiguration(string connectionString)
             => new TelemetryConfiguration
             {
-                ConnectionString = $"InstrumentationKey={instrumentationKey}",
+                ConnectionString = connectionString,
             };
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Microsoft.ApplicationInsights.Profiler.Core.Logging
         {
             get
             {
-                return _connectionString ?? (ConnectionString.TryParse(_telemetryConfiguration.InstrumentationKey, out _connectionString) ? _connectionString : default(ConnectionString));
+                return _connectionString ?? (ConnectionString.TryParse(_telemetryConfiguration.ConnectionString, out _connectionString) ? _connectionString : default(ConnectionString));
             }
             set
             {

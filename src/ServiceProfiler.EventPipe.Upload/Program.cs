@@ -112,7 +112,7 @@ namespace Microsoft.ApplicationInsights.Profiler.Uploader
             services.TryAddSingleton<IAppInsightsLogger>(provider =>
             {
                 IAppInsightsLogger logger = new EventPipeAppInsightsLogger(
-                    TelemetryConstants.ServiceProfilerAgentIKey);
+                    TelemetryConstants.ServiceProfilerAgentConnectionString);
                 UploadContext uploaderContext = provider.GetRequiredService<UploadContext>();
 
                 logger.SetCommonProperty(Constants.SessionId, uploaderContext.SessionId.ToString("o", CultureInfo.InvariantCulture));

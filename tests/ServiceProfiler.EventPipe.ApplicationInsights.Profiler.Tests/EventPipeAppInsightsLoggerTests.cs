@@ -34,9 +34,9 @@ namespace ServiceProfiler.EventPipe.Client.Tests
         }
 
         [Fact]
-        public void ShouldBuildInstrumentationKeyOnlyConfigurationFromGuid()
+        public void ShouldBuildConfigurationFromConnectionString()
         {
-            using EventPipeAppInsightsLogger logger = new(TestIKey);
+            using EventPipeAppInsightsLogger logger = new($"InstrumentationKey={TestIKey}");
 
             Assert.NotNull(logger.ConnectionString);
             Assert.Equal(TestIKey, logger.ConnectionString!.InstrumentationKeyGuid);
