@@ -56,17 +56,6 @@ Profiler traces appear in Application Insights after a few minutes. [How to view
 
 ---
 
-## Codeless enablement (no code change) — Beta
-
-Running on **Azure App Service**? You can enable the profiler **without changing your app's code, adding a NuGet package, or recompiling**. A Kudu/SCM **Site Extension** (Windows) injects an ASP.NET Core `IHostingStartup` at process start, detects your app's telemetry stack (OpenTelemetry or classic Application Insights), and enables the matching profiler automatically. Enablement is **fail-safe** — if anything is incompatible, the profiler disables itself and your app keeps running.
-
-All you need is an `APPLICATIONINSIGHTS_CONNECTION_STRING` app setting and a supported .NET telemetry stack.
-
-- 📖 [Enable the profiler codelessly (site extension)](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net/wiki/How-to-enable-profiler-codelessly)
-- 🔍 [Diagnose codeless startup](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net/wiki/How-to-diagnose-codeless-startup)
-
----
-
 ### Option A: Application Insights SDK for ASP.NET Core (Experimental)
 
 > ⚠️ **Experimental** — This integration is under active development. Please [report any issues](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net/issues/new) you encounter.
@@ -217,6 +206,17 @@ Assuming you are building an **ASP.NET Core application**:
 📖 **Full example:** [aspnetcore-webapi](./examples/aspnetcore-webapi)
 
 </details>
+
+---
+
+## Codeless enablement (no code change) — Beta
+
+Running on **Azure App Service**? You can enable the profiler **without changing your app's code, adding a NuGet package, or recompiling**. A Kudu/SCM **Site Extension** (Windows) injects an ASP.NET Core `IHostingStartup` at process start, detects your app's telemetry stack (OpenTelemetry or classic Application Insights), and enables the matching profiler automatically. Enablement is **fail-safe** — if anything is incompatible, the profiler disables itself and your app keeps running.
+
+All you need is an `APPLICATIONINSIGHTS_CONNECTION_STRING` app setting and a supported .NET telemetry stack.
+
+- 📖 [Enable the profiler codelessly (site extension)](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net/wiki/How-to-enable-profiler-codelessly)
+- 🔍 [Diagnose codeless startup](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net/wiki/How-to-diagnose-codeless-startup)
 
 ---
 
