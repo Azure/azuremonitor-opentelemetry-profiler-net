@@ -117,6 +117,10 @@ public sealed class ProfilerBootstrapper : IHostingStartup
                 BootstrapLog.Info("The App Service Application Insights agent is instrumenting this application at runtime, but the application does not reference a supported telemetry SDK in its build (*.deps.json), so the codeless profiler cannot be enabled against it. To enable the profiler, add the latest 'Microsoft.ApplicationInsights.AspNetCore' NuGet package (version 3.0 or later, which is OpenTelemetry-based) to the application and redeploy. The profiler will then activate automatically.");
                 break;
 
+            case TelemetryStack.AzureFunctionsPlatformHost:
+                BootstrapLog.Info("This process is the Azure Functions platform host, not the customer's isolated worker. Codeless profiler activation is intentionally suppressed in this process; the customer worker is detected independently.");
+                break;
+
             default:
                 BootstrapLog.Error("No supported telemetry stack (OpenTelemetry, the Azure Monitor OpenTelemetry distro, the OpenTelemetry-based Application Insights SDK 3.x, or the classic Application Insights SDK 2.x) was detected. The profiler will NOT be activated.");
                 break;
