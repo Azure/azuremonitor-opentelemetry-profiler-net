@@ -41,9 +41,9 @@ internal enum TelemetryStack
     AgentInstrumentedNoSdk,
 
     /// <summary>
-    /// The current process is the Azure Functions platform host, not the customer's isolated worker.
-    /// Site-global injection reaches both processes, so codeless enablement intentionally does nothing in
-    /// this process and lets the customer worker perform its own telemetry-stack detection.
+    /// The current process is the Azure Functions platform host for an out-of-process worker app, not the
+    /// customer's worker. Site-global injection reaches both processes, so codeless enablement intentionally
+    /// does nothing in this process and lets a supported .NET isolated worker perform its own detection.
     /// </summary>
     AzureFunctionsPlatformHost,
 }

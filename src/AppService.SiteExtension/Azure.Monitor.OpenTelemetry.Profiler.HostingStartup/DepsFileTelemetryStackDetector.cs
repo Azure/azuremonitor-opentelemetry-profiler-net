@@ -21,7 +21,7 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
 {
     private const string AzureFunctionsHostAssembly = "Microsoft.Azure.WebJobs.Script.WebHost";
     private const string FunctionsWorkerRuntimeEnvVar = "FUNCTIONS_WORKER_RUNTIME";
-    private const string DotNetIsolatedWorkerRuntime = "dotnet-isolated";
+    private const string DotNetInProcessWorkerRuntime = "dotnet";
 
     // Set by the App Service pre-installed Application Insights codeless agent (DiagnosticServices). Its
     // presence means telemetry is being instrumented at RUNTIME by the agent - which our build-time
@@ -81,22 +81,20 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
         string? entryAssemblyName = _entryAssemblyNameProvider();
         string? path = _depsFilePathProvider();
         string? functionsWorkerRuntime = _environmentVariableProvider(FunctionsWorkerRuntimeEnvVar);
-        bool isDotNetIsolatedFunctionsApp = string.Equals(
-            functionsWorkerRuntime,
-            DotNetIsolatedWorkerRuntime,
-            StringComparison.OrdinalIgnoreCase);
+        bool isOutOfProcessFunctionsApp =
+            !string.IsNullOrEmpty(functionsWorkerRuntime)
+            && !string.Equals(functionsWorkerRuntime, DotNetInProcessWorkerRuntime, StringComparison.OrdinalIgnoreCase);
         BootstrapLog.Info(
             $"Telemetry detection context: PID={_processIdProvider()}, " +
             $"entry assembly='{entryAssemblyName ?? "<unknown>"}', " +
             $".deps.json='{path ?? "<not found>"}', " +
             $"Functions worker runtime='{functionsWorkerRuntime ?? "<not set>"}'.");
 
-        // The site extension is injected at site scope, so an isolated Functions app runs this code in both
-        // the platform host and the customer's worker. Suppress the host before inspecting its telemetry
-        // dependencies. The worker inherits FUNCTIONS_WORKER_RUNTIME, so the exact host identity remains
-        // required; the runtime value distinguishes isolated apps from in-process apps where customer code
-        // runs inside this host process.
-        if (isDotNetIsolatedFunctionsApp && IsAzureFunctionsPlatformHost(entryAssemblyName))
+        // The site extension is injected at site scope, so an out-of-process Functions app runs this code in
+        // both the platform host and any managed customer worker. Suppress the host before inspecting its
+        // telemetry dependencies. Workers inherit FUNCTIONS_WORKER_RUNTIME, so exact host identity remains
+        // required; only the "dotnet" in-process model runs customer code inside this host process.
+        if (isOutOfProcessFunctionsApp && IsAzureFunctionsPlatformHost(entryAssemblyName))
         {
             BootstrapLog.Info("Detected the Azure Functions platform host process; profiler activation is intentionally suppressed in this process.");
             return TelemetryStack.AzureFunctionsPlatformHost;
@@ -115,7 +113,7 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
             return TelemetryStack.None;
         }
 
-        if (isDotNetIsolatedFunctionsApp && ContainsExactPackage(content!, AzureFunctionsHostAssembly))
+        if (isOutOfProcessFunctionsApp && ContainsExactPackage(content!, AzureFunctionsHostAssembly))
         {
             BootstrapLog.Info("The selected .deps.json belongs to the Azure Functions platform host; profiler activation is intentionally suppressed in this process.");
             return TelemetryStack.AzureFunctionsPlatformHost;

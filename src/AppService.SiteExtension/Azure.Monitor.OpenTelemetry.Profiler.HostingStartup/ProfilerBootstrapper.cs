@@ -118,7 +118,7 @@ public sealed class ProfilerBootstrapper : IHostingStartup
                 break;
 
             case TelemetryStack.AzureFunctionsPlatformHost:
-                BootstrapLog.Info("This process is the Azure Functions platform host for a .NET isolated app, not the customer's worker. Codeless profiler activation is intentionally suppressed in this process; an isolated worker using ASP.NET Core integration is detected independently.");
+                BootstrapLog.Info("This process is the Azure Functions platform host for an out-of-process worker app, not the customer's worker. Codeless profiler activation is intentionally suppressed in this process; a supported .NET isolated worker using ASP.NET Core integration is detected independently.");
                 break;
 
             default:
