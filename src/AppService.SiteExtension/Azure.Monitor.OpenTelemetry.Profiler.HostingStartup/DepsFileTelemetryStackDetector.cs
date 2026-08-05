@@ -20,6 +20,8 @@ namespace Azure.Monitor.OpenTelemetry.Profiler.HostingStartup;
 internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
 {
     private const string AzureFunctionsHostAssembly = "Microsoft.Azure.WebJobs.Script.WebHost";
+    private const string FunctionsWorkerRuntimeEnvVar = "FUNCTIONS_WORKER_RUNTIME";
+    private const string DotNetIsolatedWorkerRuntime = "dotnet-isolated";
 
     // Set by the App Service pre-installed Application Insights codeless agent (DiagnosticServices). Its
     // presence means telemetry is being instrumented at RUNTIME by the agent - which our build-time
@@ -78,15 +80,23 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
     {
         string? entryAssemblyName = _entryAssemblyNameProvider();
         string? path = _depsFilePathProvider();
+        string? functionsWorkerRuntime = _environmentVariableProvider(FunctionsWorkerRuntimeEnvVar);
+        bool isDotNetIsolatedFunctionsApp = string.Equals(
+            functionsWorkerRuntime,
+            DotNetIsolatedWorkerRuntime,
+            StringComparison.OrdinalIgnoreCase);
         BootstrapLog.Info(
             $"Telemetry detection context: PID={_processIdProvider()}, " +
             $"entry assembly='{entryAssemblyName ?? "<unknown>"}', " +
-            $".deps.json='{path ?? "<not found>"}'.");
+            $".deps.json='{path ?? "<not found>"}', " +
+            $"Functions worker runtime='{functionsWorkerRuntime ?? "<not set>"}'.");
 
         // The site extension is injected at site scope, so an isolated Functions app runs this code in both
         // the platform host and the customer's worker. Suppress the host before inspecting its telemetry
-        // dependencies; FUNCTIONS_* settings cannot be used because the customer worker inherits them too.
-        if (IsAzureFunctionsPlatformHost(entryAssemblyName))
+        // dependencies. The worker inherits FUNCTIONS_WORKER_RUNTIME, so the exact host identity remains
+        // required; the runtime value distinguishes isolated apps from in-process apps where customer code
+        // runs inside this host process.
+        if (isDotNetIsolatedFunctionsApp && IsAzureFunctionsPlatformHost(entryAssemblyName))
         {
             BootstrapLog.Info("Detected the Azure Functions platform host process; profiler activation is intentionally suppressed in this process.");
             return TelemetryStack.AzureFunctionsPlatformHost;
@@ -105,13 +115,13 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
             return TelemetryStack.None;
         }
 
-        TelemetryStack stack = DetectFromDepsJson(content!);
-        if (stack == TelemetryStack.AzureFunctionsPlatformHost)
+        if (isDotNetIsolatedFunctionsApp && ContainsExactPackage(content!, AzureFunctionsHostAssembly))
         {
             BootstrapLog.Info("The selected .deps.json belongs to the Azure Functions platform host; profiler activation is intentionally suppressed in this process.");
+            return TelemetryStack.AzureFunctionsPlatformHost;
         }
 
-        return stack;
+        return DetectFromDepsJson(content!);
     }
 
     /// <summary>
@@ -127,16 +137,7 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
     /// </remarks>
     internal static TelemetryStack DetectFromDepsJson(string depsJson)
     {
-        // 0. Back off in the Azure Functions platform host. Site-global injection also reaches the customer's
-        //    isolated worker, whose own dependency graph is classified normally in that separate process.
-        //    The exact host library key avoids suppressing customer workers that reference
-        //    Microsoft.Azure.Functions.Worker or inherit FUNCTIONS_* environment variables.
-        if (ContainsExactPackage(depsJson, AzureFunctionsHostAssembly))
-        {
-            return TelemetryStack.AzureFunctionsPlatformHost;
-        }
-
-        // 1. Back off if the app already references an EventPipe profiler NuGet - it activates the profiler in
+        // 0. Back off if the app already references an EventPipe profiler NuGet - it activates the profiler in
         //    its own code, so codeless enablement must not activate a second time (double EventPipe session).
         //    Uses the exact "<pkg>/" library-key marker so "Azure.Monitor.OpenTelemetry.Profiler" does not
         //    match its dependency "Azure.Monitor.OpenTelemetry.Profiler.Core".
@@ -146,13 +147,13 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
             return TelemetryStack.AlreadyInstrumented;
         }
 
-        // 2. Azure Monitor OpenTelemetry distro - unambiguous, supported OpenTelemetry signal.
+        // 1. Azure Monitor OpenTelemetry distro - unambiguous, supported OpenTelemetry signal.
         if (ContainsPackageToken(depsJson, "Azure.Monitor.OpenTelemetry.AspNetCore"))
         {
             return TelemetryStack.OpenTelemetry;
         }
 
-        // 3. Application Insights ASP.NET Core / Worker Service SDK. 3.x is an OpenTelemetry-based wrapper
+        // 2. Application Insights ASP.NET Core / Worker Service SDK. 3.x is an OpenTelemetry-based wrapper
         //    (supported via the OpenTelemetry profiler); 2.x is the legacy classic SDK (not supported).
         //    Checked before the generic OpenTelemetry test below, which 3.x pulls in transitively.
         if (ContainsPackageToken(depsJson, "Microsoft.ApplicationInsights.AspNetCore")
@@ -175,7 +176,7 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
             return major >= 3 ? TelemetryStack.OpenTelemetry : TelemetryStack.LegacyApplicationInsights;
         }
 
-        // 4. Manual OpenTelemetry setup (SDK / hosting) without either the distro or the AI SDK.
+        // 3. Manual OpenTelemetry setup (SDK / hosting) without either the distro or the AI SDK.
         if (ContainsPackageToken(depsJson, "OpenTelemetry"))
         {
             return TelemetryStack.OpenTelemetry;

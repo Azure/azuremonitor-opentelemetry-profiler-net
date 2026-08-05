@@ -75,7 +75,7 @@ public class DepsFileTelemetryStackDetectorTests
     [InlineData(ClassicProfilerReferencedDeps, TelemetryStack.AlreadyInstrumented)]
     [InlineData(OtelProfilerCoreOnlyDeps, TelemetryStack.OpenTelemetry)]
     [InlineData(IsolatedFunctionsWorkerDeps, TelemetryStack.OpenTelemetry)]
-    [InlineData(AzureFunctionsPlatformHostDeps, TelemetryStack.AzureFunctionsPlatformHost)]
+    [InlineData(AzureFunctionsPlatformHostDeps, TelemetryStack.LegacyApplicationInsights)]
     internal void DetectFromDepsJson_ClassifiesStack(string depsJson, TelemetryStack expected)
     {
         Assert.Equal(expected, DepsFileTelemetryStackDetector.DetectFromDepsJson(depsJson));
@@ -125,6 +125,7 @@ public class DepsFileTelemetryStackDetectorTests
         DepsFileTelemetryStackDetector detector = new(
             depsFilePathProvider: () => null,
             readAllText: _ => null,
+            environmentVariableProvider: name => name == "FUNCTIONS_WORKER_RUNTIME" ? "dotnet-isolated" : null,
             entryAssemblyNameProvider: () => "Microsoft.Azure.WebJobs.Script.WebHost",
             processIdProvider: () => 4242);
 
@@ -137,10 +138,37 @@ public class DepsFileTelemetryStackDetectorTests
         DepsFileTelemetryStackDetector detector = new(
             depsFilePathProvider: () => @"C:\home\site\wwwroot\EventHubProfiler_Function.deps.json",
             readAllText: _ => IsolatedFunctionsWorkerDeps,
+            environmentVariableProvider: name => name == "FUNCTIONS_WORKER_RUNTIME" ? "dotnet-isolated" : null,
             entryAssemblyNameProvider: () => "EventHubProfiler_Function",
             processIdProvider: () => 4243);
 
         Assert.Equal(TelemetryStack.OpenTelemetry, detector.Detect());
+    }
+
+    [Fact]
+    internal void Detect_WhenInProcessFunctionsHost_ClassifiesTelemetryStack()
+    {
+        DepsFileTelemetryStackDetector detector = new(
+            depsFilePathProvider: () => @"C:\Program Files\SiteExtensions\Functions\Microsoft.Azure.WebJobs.Script.WebHost.deps.json",
+            readAllText: _ => AzureFunctionsPlatformHostDeps,
+            environmentVariableProvider: name => name == "FUNCTIONS_WORKER_RUNTIME" ? "dotnet" : null,
+            entryAssemblyNameProvider: () => "Microsoft.Azure.WebJobs.Script.WebHost",
+            processIdProvider: () => 4244);
+
+        Assert.Equal(TelemetryStack.LegacyApplicationInsights, detector.Detect());
+    }
+
+    [Fact]
+    internal void Detect_WhenIsolatedFunctionsHostIdentifiedFromDeps_SuppressesActivation()
+    {
+        DepsFileTelemetryStackDetector detector = new(
+            depsFilePathProvider: () => @"C:\Program Files\SiteExtensions\Functions\Microsoft.Azure.WebJobs.Script.WebHost.deps.json",
+            readAllText: _ => AzureFunctionsPlatformHostDeps,
+            environmentVariableProvider: name => name == "FUNCTIONS_WORKER_RUNTIME" ? "DOTNET-ISOLATED" : null,
+            entryAssemblyNameProvider: () => "dotnet",
+            processIdProvider: () => 4245);
+
+        Assert.Equal(TelemetryStack.AzureFunctionsPlatformHost, detector.Detect());
     }
 
     [Fact]
