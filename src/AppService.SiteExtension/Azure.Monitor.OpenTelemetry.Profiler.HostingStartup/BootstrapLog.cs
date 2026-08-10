@@ -140,7 +140,7 @@ internal static class BootstrapLog
         return true;
     }
 
-    private static int GetProcessId()
+    internal static int GetProcessId()
     {
         try { return Environment.ProcessId; } catch { return 0; }
     }

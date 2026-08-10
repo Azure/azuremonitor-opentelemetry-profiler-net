@@ -19,6 +19,10 @@ namespace Azure.Monitor.OpenTelemetry.Profiler.HostingStartup;
 /// </remarks>
 internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
 {
+    private const string AzureFunctionsHostAssembly = "Microsoft.Azure.WebJobs.Script.WebHost";
+    private const string FunctionsWorkerRuntimeEnvVar = "FUNCTIONS_WORKER_RUNTIME";
+    private const string DotNetInProcessWorkerRuntime = "dotnet";
+
     // Set by the App Service pre-installed Application Insights codeless agent (DiagnosticServices). Its
     // presence means telemetry is being instrumented at RUNTIME by the agent - which our build-time
     // *.deps.json scan cannot see - so an otherwise-undetected app is still emitting telemetry.
@@ -27,20 +31,30 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
     private readonly Func<string?> _depsFilePathProvider;
     private readonly Func<string, string?> _readAllText;
     private readonly Func<string, string?> _environmentVariableProvider;
+    private readonly Func<string?> _entryAssemblyNameProvider;
+    private readonly Func<int> _processIdProvider;
 
     public DepsFileTelemetryStackDetector()
-        : this(GetEntryAssemblyDepsPath, TryReadAllText)
+        : this(
+            GetEntryAssemblyDepsPath,
+            TryReadAllText,
+            entryAssemblyNameProvider: GetEntryAssemblyName,
+            processIdProvider: BootstrapLog.GetProcessId)
     {
     }
 
     internal DepsFileTelemetryStackDetector(
         Func<string?> depsFilePathProvider,
         Func<string, string?> readAllText,
-        Func<string, string?>? environmentVariableProvider = null)
+        Func<string, string?>? environmentVariableProvider = null,
+        Func<string?>? entryAssemblyNameProvider = null,
+        Func<int>? processIdProvider = null)
     {
         _depsFilePathProvider = depsFilePathProvider ?? throw new ArgumentNullException(nameof(depsFilePathProvider));
         _readAllText = readAllText ?? throw new ArgumentNullException(nameof(readAllText));
         _environmentVariableProvider = environmentVariableProvider ?? Environment.GetEnvironmentVariable;
+        _entryAssemblyNameProvider = entryAssemblyNameProvider ?? GetEntryAssemblyName;
+        _processIdProvider = processIdProvider ?? BootstrapLog.GetProcessId;
     }
 
     public TelemetryStack Detect()
@@ -64,7 +78,28 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
 
     private TelemetryStack DetectFromDeps()
     {
+        string? entryAssemblyName = _entryAssemblyNameProvider();
         string? path = _depsFilePathProvider();
+        string? functionsWorkerRuntime = _environmentVariableProvider(FunctionsWorkerRuntimeEnvVar);
+        bool isOutOfProcessFunctionsApp =
+            !string.IsNullOrEmpty(functionsWorkerRuntime)
+            && !string.Equals(functionsWorkerRuntime, DotNetInProcessWorkerRuntime, StringComparison.OrdinalIgnoreCase);
+        BootstrapLog.Info(
+            $"Telemetry detection context: PID={_processIdProvider()}, " +
+            $"entry assembly='{entryAssemblyName ?? "<unknown>"}', " +
+            $".deps.json='{path ?? "<not found>"}', " +
+            $"Functions worker runtime='{functionsWorkerRuntime ?? "<not set>"}'.");
+
+        // The site extension is injected at site scope, so an out-of-process Functions app runs this code in
+        // both the platform host and any managed customer worker. Suppress the host before inspecting its
+        // telemetry dependencies. Workers inherit FUNCTIONS_WORKER_RUNTIME, so exact host identity remains
+        // required; only the "dotnet" in-process model runs customer code inside this host process.
+        if (isOutOfProcessFunctionsApp && IsAzureFunctionsPlatformHost(entryAssemblyName))
+        {
+            BootstrapLog.Info("Detected the Azure Functions platform host process; profiler activation is intentionally suppressed in this process.");
+            return TelemetryStack.AzureFunctionsPlatformHost;
+        }
+
         if (string.IsNullOrEmpty(path))
         {
             BootstrapLog.Info("Could not locate the application's .deps.json; treating telemetry stack as undetected.");
@@ -76,6 +111,12 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
         {
             BootstrapLog.Info($"The application's .deps.json at '{path}' was empty or unreadable; treating telemetry stack as undetected.");
             return TelemetryStack.None;
+        }
+
+        if (isOutOfProcessFunctionsApp && ContainsExactPackage(content!, AzureFunctionsHostAssembly))
+        {
+            BootstrapLog.Info("The selected .deps.json belongs to the Azure Functions platform host; profiler activation is intentionally suppressed in this process.");
+            return TelemetryStack.AzureFunctionsPlatformHost;
         }
 
         return DetectFromDepsJson(content!);
@@ -159,6 +200,9 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
     private static bool ContainsExactPackage(string depsJson, string package) =>
         depsJson.IndexOf("\"" + package + "/", StringComparison.OrdinalIgnoreCase) >= 0;
 
+    private static bool IsAzureFunctionsPlatformHost(string? entryAssemblyName) =>
+        string.Equals(entryAssemblyName, AzureFunctionsHostAssembly, StringComparison.OrdinalIgnoreCase);
+
     /// <summary>
     /// Extracts the major version from a <c>.deps.json</c> library key of the exact form
     /// <c>"&lt;package&gt;/&lt;version&gt;"</c> (e.g. <c>"Microsoft.ApplicationInsights.AspNetCore/3.1.2"</c>).
@@ -214,6 +258,8 @@ internal sealed class DepsFileTelemetryStackDetector : ITelemetryStackDetector
         string candidate = Path.Combine(directory!, assemblyName + ".deps.json");
         return File.Exists(candidate) ? candidate : null;
     }
+
+    private static string? GetEntryAssemblyName() => Assembly.GetEntryAssembly()?.GetName().Name;
 
     private static string? TryReadAllText(string path)
     {

@@ -163,6 +163,20 @@ public class ProfilerBootstrapperRoutingTests
     }
 
     [Fact]
+    internal void Apply_WhenAzureFunctionsPlatformHost_BacksOffAndRegistersNothing()
+    {
+        (Mock<IWebHostBuilder> builder, List<Action<IServiceCollection>> captured) = CreateBuilder();
+        Mock<IProfilerActivatorInvoker> invoker = new();
+        ProfilerBootstrapper bootstrapper = CreateBootstrapper(TelemetryStack.None, invoker.Object);
+
+        bootstrapper.Apply(builder.Object, TelemetryStack.AzureFunctionsPlatformHost);
+
+        Assert.Empty(captured);
+        builder.Verify(b => b.ConfigureServices(It.IsAny<Action<IServiceCollection>>()), Times.Never);
+        invoker.Verify(i => i.Invoke(It.IsAny<TelemetryStack>(), It.IsAny<IServiceCollection>()), Times.Never);
+    }
+
+    [Fact]
     internal void Apply_WhenDependencyFloorViolation_DoesNotInvokeActivator()
     {
         // A below-floor shared dependency loaded by the app: the deferred callback must back off (log) and
