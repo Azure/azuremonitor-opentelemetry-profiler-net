@@ -34,9 +34,9 @@ If you are planning to host your applications in Linux, or run your application 
 
 There are 2 flavors of the **EventPipe profilers**, it depends on the Application Insights SDKs you pick.
 
-- If you are using [Azure Monitor OpenTelemetry distribution](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=aspnetcore), follow the instructions to use **[Azure Monitor OpenTelemetry Profiler](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net)** — see [Option A in the README](../README.md#option-a-azure-monitor-opentelemetry-distro).
+- If you are using [Azure Monitor OpenTelemetry distribution](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=aspnetcore), follow the instructions to use **[Azure Monitor OpenTelemetry Profiler](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net)** — see the [setup guide](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net/wiki/Enable-with-Azure-Monitor-OpenTelemetry-Distro).
 
-- If you are using [Application Insights for ASP.NET Core](https://learn.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core) **3.x** (`Microsoft.ApplicationInsights.AspNetCore` 3.x, which is OpenTelemetry-based), you can use the same **[Azure Monitor OpenTelemetry Profiler](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net)** package — see [Option B in the README](../README.md#option-b-application-insights-aspnet-core-3x-experimental). ⚠️ _Experimental._
+- If you are using [Application Insights for ASP.NET Core](https://learn.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core) **3.x** (`Microsoft.ApplicationInsights.AspNetCore` 3.x, which is OpenTelemetry-based), you can use the same **[Azure Monitor OpenTelemetry Profiler](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net)** package — see the [setup guide](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net/wiki/Enable-with-Application-Insights-SDK). ⚠️ _Experimental._
 
 - If you are using the traditional [Application Insights for ASP.NET Core applications](https://learn.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core) **2.x**, follow the instructions to use [Application Insights Profiler for ASP.NET Core](https://github.com/microsoft/ApplicationInsights-Profiler-AspNetCore)
 
