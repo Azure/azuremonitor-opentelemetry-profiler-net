@@ -22,7 +22,7 @@ Setting up a proper role name helps organize profiling sessions effectively. For
 
     * **Using code (Azure Monitor OpenTelemetry distro)**:  
 
-      If you are using `Azure.Monitor.OpenTelemetry.AspNetCore` ([Option A](../README.md#option-a-azure-monitor-opentelemetry-distro)):
+      If you are using `Azure.Monitor.OpenTelemetry.AspNetCore` ([setup guide](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net/wiki/Enable-with-Azure-Monitor-OpenTelemetry-Distro)):
 
       ```csharp
       builder.Services.AddOpenTelemetry().UseAzureMonitor();
@@ -33,7 +33,7 @@ Setting up a proper role name helps organize profiling sessions effectively. For
 
     * **Using code (Application Insights 3.x)**:  
 
-      If you are using `Microsoft.ApplicationInsights.AspNetCore` 3.x ([Option B](../README.md#option-b-application-insights-aspnet-core-3x-experimental)):
+      If you are using `Microsoft.ApplicationInsights.AspNetCore` 3.x ([setup guide](https://github.com/Azure/azuremonitor-opentelemetry-profiler-net/wiki/Enable-with-Application-Insights-SDK)):
 
       ```csharp
       builder.Services.AddApplicationInsightsTelemetry();
