@@ -98,8 +98,7 @@ internal class TraceUploaderByNamedPipe : TraceUploader
             Logger.LogTrace("Sent verified appId.");
 
             Logger.LogTrace("Receiving additional data");
-            uploadContextExtension.AdditionalData = await namedPipeServer.ReadAsync<IPCAdditionalData>(timeout: TimeSpan.FromSeconds(0.5), cancellationToken).ConfigureAwait(false);
-            Logger.LogTrace("Additional data received");
+            uploadContextExtension.AdditionalData = await ReadAdditionalDataAsync(namedPipeServer, cancellationToken).ConfigureAwait(false);
 
             return uploadContextExtension.VerifiedAppId != Guid.Empty && ShouldUploadTrace(UploadContext.UploadMode, samples.Count()) ?
                 uploadContextExtension
@@ -109,5 +108,71 @@ internal class TraceUploaderByNamedPipe : TraceUploader
         {
             (namedPipeServer as IDisposable)?.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Reads the <see cref="IPCAdditionalData"/> payload sent by the profiler.
+    /// </summary>
+    /// <remarks>
+    /// This payload is not optional enrichment: it carries the connection string used to emit the
+    /// custom events, and the ServiceProfilerIndex event through which the trace is discovered.
+    /// Without it an uploaded trace is orphaned - storage is consumed and the upload reports
+    /// success, but the trace can never be surfaced. Failing here is therefore the correct outcome,
+    /// and it happens before the trace is zipped and uploaded, so nothing is wasted.
+    /// <para>
+    /// The read uses <see cref="NamedPipeOptions.ExtendedMessageTimeout"/>, the same budget the
+    /// profiler uses to send it. It previously used a hard-coded 500ms, which had to cover the
+    /// profiler waking from its own read, deriving the artifact id, building this payload over
+    /// every sample and serializing it - so a loaded machine could exceed it while the profiler was
+    /// working normally, and the trace was discarded.
+    /// </para>
+    /// </remarks>
+    private async Task<IPCAdditionalData> ReadAdditionalDataAsync(INamedPipeServerService namedPipeServer, CancellationToken cancellationToken)
+    {
+        IPCAdditionalData? additionalData;
+        try
+        {
+            additionalData = await namedPipeServer.ReadAsync<IPCAdditionalData>(NamedPipeOptions.ExtendedMessageTimeout, cancellationToken).ConfigureAwait(false);
+        }
+        catch (TimeoutException ex)
+        {
+            // Rethrow with the consequence spelled out. The bare "Can't finish reading message
+            // within given timeout" gives no indication of which message was lost or why that ends
+            // the upload.
+            throw new TimeoutException(
+                "Timed out waiting for the profiler to send the additional data (connection string, " +
+                "index and samples). The trace cannot be indexed without it, so the upload is abandoned. " +
+                "This usually means the profiler process was starved or stopped before it could send.",
+                ex);
+        }
+
+        // A payload that arrives but is missing what makes the trace discoverable is the same
+        // outcome as one that never arrives: the blob would upload and commit, and then either the
+        // index event is skipped or the telemetry configuration throws - after the artifact is
+        // already committed. Check here, before anything is zipped or uploaded, so the failure
+        // stays cheap and leaves nothing behind.
+        if (additionalData is null)
+        {
+            throw new InvalidOperationException(
+                "The profiler sent no additional data (connection string, index and samples). " +
+                "The trace cannot be indexed without it, so the upload is abandoned.");
+        }
+
+        if (string.IsNullOrEmpty(additionalData.ConnectionString))
+        {
+            throw new InvalidOperationException(
+                "The additional data from the profiler carries no connection string, so the custom " +
+                "events that make the trace discoverable cannot be sent. The upload is abandoned.");
+        }
+
+        if (additionalData.ServiceProfilerIndex is null)
+        {
+            throw new InvalidOperationException(
+                "The additional data from the profiler carries no index, so the trace could be " +
+                "uploaded but never surfaced. The upload is abandoned.");
+        }
+
+        Logger.LogTrace("Additional data received");
+        return additionalData;
     }
 }

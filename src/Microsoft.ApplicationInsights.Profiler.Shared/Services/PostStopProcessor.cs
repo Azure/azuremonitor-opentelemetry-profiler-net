@@ -128,8 +128,8 @@ internal class PostStopProcessor : IPostStopProcessor
                 // Contract with Uploader: Only valid samples are written back.
                 _logger.LogTrace("Waiting for the uploader to write back valid samples according to the contract.");
                 // The uploader might need a while for sample validation before it returns the result. That is especially true under heavy loaded system.
-                // Give it at least 10 minutes as a reasonable timeout. The user could choose to overwrite it with even longer time span by setting up operation timeout.
-                double longerTimeoutMilliseconds = Math.Max(TimeSpan.FromMinutes(10).TotalMilliseconds, _serviceProfilerOptions.NamedPipe.DefaultMessageTimeout.TotalMilliseconds);
+                // Give it at least the extended budget as a reasonable timeout. The user could choose to overwrite it with even longer time span by setting up operation timeout.
+                double longerTimeoutMilliseconds = Math.Max(NamedPipeOptions.ExtendedMessageTimeout.TotalMilliseconds, _serviceProfilerOptions.NamedPipe.DefaultMessageTimeout.TotalMilliseconds);
                 e.Samples = (await namedPipeClient.ReadAsync<IEnumerable<SampleActivity>>(timeout: TimeSpan.FromMilliseconds(longerTimeoutMilliseconds)).ConfigureAwait(false)) ?? [];
                 _logger.LogTrace("Finished loading valid samples.");
 
@@ -155,27 +155,25 @@ internal class PostStopProcessor : IPostStopProcessor
                 // Contract with Upload, sending additional data
                 Guid artifactId = ArtifactIdDerivation.DeriveArtifactId(e.SessionId, _serviceProfilerContext.MachineName);
                 IPCAdditionalData additionalData = CreateAdditionalData(e.Samples.ToImmutableArray(), stampId: "%StampId%", e.SessionId, appId, artifactId, e.ProfilerSource, e.AverageCPUUsage, e.AverageMemoryUsage);
-                if (_logger.IsEnabled(LogLevel.Trace))
-                {
-                    _logger.LogTrace("Sending additional data for the uploader to use.");
-                    if (_serializer.TrySerialize(additionalData, out string? serializedObject))
-                    {
-                        _logger.LogTrace("===== {serialized} =====", Environment.NewLine + serializedObject + Environment.NewLine);
-                    }
-                    else
-                    {
-                        if (e.Samples.Any())
-                        {
-                            _logger.LogWarning("Although there are valid samples, there's no additional data. Why?");
-                        }
-                        else
-                        {
-                            _logger.LogTrace("No additional data");
-                        }
-                    }
-                }
-                await namedPipeClient.SendAsync(additionalData, TimeSpan.FromMilliseconds(longerTimeoutMilliseconds), cancellationToken).ConfigureAwait(false);
+
+                _logger.LogTrace("Sending additional data for the uploader to use.");
+                // Pinned to ExtendedMessageTimeout rather than the configurable budget above,
+                // because the uploader reads this message with the same constant and cannot see
+                // user configuration - it runs in a separate process that only ever gets the option
+                // defaults. A longer write budget here could only wait past the point the reader
+                // had already given up.
+                await namedPipeClient.SendAsync(additionalData, NamedPipeOptions.ExtendedMessageTimeout, cancellationToken).ConfigureAwait(false);
                 _logger.LogTrace("Additional data sent.");
+
+                // Diagnostic dump happens after the send, not before it. The uploader is already
+                // waiting on this message at this point, so serializing the whole payload a second
+                // time just to log it would delay the thing being measured - making the failure
+                // mode more likely precisely when tracing is turned on to investigate it.
+                // SendAsync has already serialized successfully by now, so this cannot fail.
+                if (_logger.IsEnabled(LogLevel.Trace) && _serializer.TrySerialize(additionalData, out string? serializedObject))
+                {
+                    _logger.LogTrace("===== {serialized} =====", Environment.NewLine + serializedObject + Environment.NewLine);
+                }
             }
             finally
             {
