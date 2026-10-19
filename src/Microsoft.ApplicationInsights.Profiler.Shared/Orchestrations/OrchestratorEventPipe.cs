@@ -23,6 +23,8 @@ namespace Microsoft.ApplicationInsights.Profiler.Shared.Orchestrations;
 ///</summary>
 internal abstract class OrchestratorEventPipe : Orchestrator
 {
+    private const int StartPolicyChangeTimeoutMilliseconds = 500;
+
     private readonly IReadOnlyCollection<SchedulingPolicy> _policyCollection;
     private readonly IServiceProfilerProvider _profilerProvider;
     private readonly IAgentStatusService _agentStatusService;
@@ -234,7 +236,7 @@ internal abstract class OrchestratorEventPipe : Orchestrator
             throw new ArgumentNullException(nameof(policy));
         }
 
-        Task<bool> waitSemaphoreTask = _policyChangeHandler.WaitAsync(TimeSpan.FromMilliseconds(500), cancellationToken);
+        Task<bool> waitSemaphoreTask = _policyChangeHandler.WaitAsync(TimeSpan.FromMilliseconds(StartPolicyChangeTimeoutMilliseconds), cancellationToken);
         try
         {
             _semaphoreTasks.TryAdd(waitSemaphoreTask, 0);
@@ -329,7 +331,7 @@ internal abstract class OrchestratorEventPipe : Orchestrator
             }
             else
             {
-                _logger.LogWarning("Can't acquire the profiler policy-change gate within {timeoutMs}ms to start profiling requested by {newSource}. A policy change is already in progress: {inProgress}.", 500, policy.Source, DescribeInProgressPolicyChange());
+                _logger.LogDebug("Can't acquire the profiler policy-change gate within {timeoutMs}ms to start profiling requested by {newSource}. A policy change is already in progress: {inProgress}.", StartPolicyChangeTimeoutMilliseconds, policy.Source, DescribeInProgressPolicyChange());
             }
 
             _logger.LogTrace("Profiling is running by policy: {source}", _currentProfilingPolicy?.Source);

@@ -184,11 +184,10 @@ public class OrchestratorEventPipeConcurrencyTests
     }
 
     [Fact]
-    public async Task StartProfilingAsync_WhenGateHeldByAnotherStart_WarningNamesInFlightOperationNotNull()
+    public async Task StartProfilingAsync_WhenGateHeldByAnotherStart_LogsDebugWithInFlightOperationWithoutWarning()
     {
-        // Regression test for issue #164: while one start holds the policy-change gate (and has not
-        // yet assigned _currentProfilingPolicy), a second start that times out on the gate must
-        // report the in-flight operation - not "(null)".
+        // Expected start-policy contention is Debug, but must still identify the in-flight start
+        // even before _currentProfilingPolicy is assigned (issues #193 and #164).
         TaskCompletionSource startEntered = new(TaskCreationOptions.RunContinuationsAsynchronously);
         TaskCompletionSource<bool> releaseStart = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -216,7 +215,7 @@ public class OrchestratorEventPipeConcurrencyTests
         Task<bool> holderTask = orchestrator.StartProfilingAsync(holder, CancellationToken.None);
         await startEntered.Task; // The gate is now held by the holder start.
 
-        // This call cannot acquire the gate within its 500ms timeout and logs the conflict warning.
+        // This call cannot acquire the gate within its 500ms timeout.
         bool waiterResult = await orchestrator.StartProfilingAsync(waiter, CancellationToken.None);
 
         // Let the holder finish.
@@ -225,10 +224,19 @@ public class OrchestratorEventPipeConcurrencyTests
 
         Assert.False(waiterResult);
 
-        string warning = Assert.Single(logger.Entries.Where(e => e.Level == LogLevel.Warning)).Message;
-        Assert.Contains("WaitingPolicy", warning);           // who was denied
-        Assert.Contains("start by HoldingPolicy", warning);  // the in-flight operation
-        Assert.DoesNotContain("(null)", warning);
+        Assert.DoesNotContain(logger.Entries, e => e.Level >= LogLevel.Warning);
+        string diagnostic = Assert.Single(logger.Entries.Where(
+            e => e.Level == LogLevel.Debug && e.Message.Contains("policy-change gate"))).Message;
+        Assert.Contains("500ms", diagnostic);
+        Assert.Contains("WaitingPolicy", diagnostic);
+        Assert.Contains("start by HoldingPolicy", diagnostic);
+        Assert.DoesNotContain("(null)", diagnostic);
+        provider.Verify(
+            p => p.StartServiceProfilerAsync(holder, It.IsAny<CancellationToken>()),
+            Times.Once);
+        provider.Verify(
+            p => p.StartServiceProfilerAsync(waiter, It.IsAny<CancellationToken>()),
+            Times.Never);
     }
 
     [Fact]
